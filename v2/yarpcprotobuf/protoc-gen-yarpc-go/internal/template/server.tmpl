@@ -1,0 +1,39 @@
+{{/*
+Defines a set of server interfaces that correspond to the Protobuf service
+definitions specified for a given .proto file.
+*/}}
+{{define "server" -}}
+
+{{/* Service interfaces */}}
+{{range s := .Services -}}
+{{$svc := $s.Name}}
+
+type {{$svc}}Server interface {
+
+{{range m := $s.UnaryMethods -}}
+  {{$m.Name}}(context.Context, {{$m.Request}}) ({{$m.Response}}, error)
+{{end -}}
+
+{{range m := $s.StreamMethods -}}
+  {{$m.Name}}({{if not .ClientSide}}{{$m.Request}},{{end -}} {{$svc}}{{$m.Name}}Server) ({{if not .ServerSide}}{{$m.Response}},{{end -}} error)
+{{end -}}
+
+}
+{{end -}}
+
+{{/* Stream server interfaces */}}
+{{range s := .Services -}}
+
+{{range m := $s.StreamMethods -}}
+type {{$m.Name}}Server interface {
+  Context() context.Context
+
+  {{if $m.ClientSide -}}
+  Recv({...yarpc.StreamOption) ({{$m.Request}}, error)
+  {{end -}}
+
+  {{if $m.ServerSide -}}
+  Send({{$m.Response}}, ...yarpc.StreamOption) error
+  {{end -}}
+}
+{{end -}}{{end -}}
