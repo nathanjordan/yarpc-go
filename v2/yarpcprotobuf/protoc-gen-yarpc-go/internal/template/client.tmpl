@@ -1,0 +1,43 @@
+{{/*
+Defines a set of client interfaces that correspond to the Protobuf service
+definitions specified for a given .proto file.
+*/}}
+
+{{/* Client interfaces */}}
+{{range s := .Services -}}
+{{$svc := $s.Name}}
+
+type {{$svc}}Client interface {
+
+{{range m := $s.UnaryMethods -}}
+  {{$m.Name}}(context.Context, {{$m.Request}}, ...yarpc.CallOption) ({{$m.Response}}, error)
+{{end -}}
+
+{{range m := $s.StreamMethods -}}
+  {{$m.Name}}(context.Context, {{if not .ClientSide}}{{$m.Request}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{$m.Response}}Client, error)
+{{end -}}
+
+}
+{{end -}}
+
+{{/* Stream client interfaces */}}
+{{range s := .Services -}}
+
+{{range m := $s.StreamMethods -}}
+type {{$m.Name}}Client interface {
+  Context() context.Context
+
+  {{if $m.ClientSide -}}
+  Send({{$m.Request}}, ...yarpc.StreamOption) error
+  {{end -}}
+
+  {{if $m.ServerSide -}}
+  Recv(...yarpc.StreamOption) ({{$m.Response}}, error)
+  CloseSend(...yarpc.StreamOption) error
+  {{end -}}
+
+  {{if $m.ClientSide and not $m.ServerSide -}}
+  CloseAndRecv(...yarpc.StreamOption) ({{$m.Response}}, error)
+  {{end -}}
+}
+{{end -}}{{end -}}
