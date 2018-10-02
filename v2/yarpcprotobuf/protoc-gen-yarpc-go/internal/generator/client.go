@@ -2,43 +2,45 @@ package generator
 
 const _clientTemplate = `
 {{define "client" -}}
+{{with .File}}
 
-{{/* Client interfaces */}}
 {{range .Services -}}
 {{$svc := .Name}}
 
-type {{$svc}}Client interface {
+  {{/* Client interface */}}
 
-{{range .UnaryMethods -}}
-  {{.Name}}(context.Context, {{.Request}}, ...yarpc.CallOption) ({{.Response}}, error)
-{{end -}}
+  type {{$svc}}Client interface {
 
-{{range .StreamMethods -}}
-  {{.Name}}(context.Context, {{if not .ClientSide}}{{.Request}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Response}}Client, error)
-{{end -}}
-
-}
-{{end -}}
-
-{{/* Stream client interfaces */}}
-{{range .Services -}}
-
-{{range .StreamMethods -}}
-type {{.Name}}Client interface {
-  Context() context.Context
-
-  {{if .ClientSide -}}
-  Send({{.Request}}, ...yarpc.StreamOption) error
+  {{range .Methods -}}
+    {{if (not .ClientStreaming) and (not .ServerStreaming) -}}
+      {{.Name}}(context.Context, {{.Request}}, ...yarpc.CallOption) ({{.Response}}, error)
+    {{else -}}
+      {{.Name}}(context.Context, {{if not .ClientStreaming}}{{.Request}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Response}}Client, error)
+    {{end -}}
   {{end -}}
+  }
 
-  {{if .ServerSide -}}
-  Recv(...yarpc.StreamOption) ({{.Response}}, error)
-  CloseSend(...yarpc.StreamOption) error
-  {{end -}}
+  {{/* Stream client interfaces */}}
 
-  {{if (not .ClientSide) and (not .ServerSide) -}}
-  CloseAndRecv(...yarpc.StreamOption) ({{.Response}}, error)
+  {{range .Methods -}}
+    {{if .ClientStreaming or .ServerStreaming}}
+    type {{.Name}}Client interface {
+      Context() context.Context
+
+    {{if .ClientStreaming -}}
+      Send({{.Request}}, ...yarpc.StreamOption) error
+    {{end -}}
+
+    {{if .ServerStreaming -}}
+      Recv(...yarpc.StreamOption) ({{.Response}}, error)
+      CloseSend(...yarpc.StreamOption) error
+    {{end -}}
+
+    {{if .ClientStreaming and (not .ServerStreaming) -}}
+      CloseAndRecv(...yarpc.StreamOption) ({{.Response}}, error)
+    {{end -}}
+    }
+    {{end -}}
   {{end -}}
-}
 {{end -}}{{end -}}{{end -}}
 `
