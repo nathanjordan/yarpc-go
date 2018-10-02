@@ -1,7 +1,8 @@
-{{/*
-Defines a set of client interfaces that correspond to the Protobuf service
-definitions specified for a given .proto file.
-*/}}
+package template
+
+// Client represents the generated client code.
+const Client = `
+{{define "client" -}}
 
 {{/* Client interfaces */}}
 {{range s := .Services -}}
@@ -40,4 +41,5 @@ type {{$m.Name}}Client interface {
   CloseAndRecv(...yarpc.StreamOption) ({{$m.Response}}, error)
   {{end -}}
 }
-{{end -}}{{end -}}
+{{end -}}{{end -}}{{end -}}
+`

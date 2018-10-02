@@ -1,7 +1,7 @@
-{{/*
-Defines a set of server interfaces that correspond to the Protobuf service
-definitions specified for a given .proto file.
-*/}}
+package template
+
+// Server represents the generated server code.
+const Server = `
 {{define "server" -}}
 
 {{/* Service interfaces */}}
@@ -36,4 +36,5 @@ type {{$m.Name}}Server interface {
   Send({{$m.Response}}, ...yarpc.StreamOption) error
   {{end -}}
 }
-{{end -}}{{end -}}
+{{end -}}{{end -}}{{end -}}
+`
