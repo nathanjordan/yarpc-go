@@ -9,8 +9,8 @@ import (
 // to the package path.
 type Imports map[string]string
 
-// NewImports returns a new Imports struct with the given paths.
-func NewImports(paths ...string) Imports {
+// newImports returns a new Imports struct with the given paths.
+func newImports(paths ...string) Imports {
 	imports := Imports{}
 	for _, path := range paths {
 		imports.Add(path)

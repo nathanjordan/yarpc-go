@@ -13,12 +13,15 @@ import (
 	plugin "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 )
 
+const _plugin = "protoc-gen-yarpc-go"
+
 // generator orchestrates code generation for protoc-gen-yarpc-go.
 type generator struct {
-	tmpl *template.Template
+	tmpl     *template.Template
+	registry *registry
 }
 
-func newGenerator() *generator {
+func newGenerator(r *registry) *generator {
 	return &generator{
 		tmpl: template.Must(
 			parseTemplates(
@@ -27,11 +30,12 @@ func newGenerator() *generator {
 				_serverTemplate,
 			),
 		),
+		registry: r,
 	}
 }
 
 func parseTemplates(templates ...string) (*template.Template, error) {
-	t := template.New("protoc-gen-yarpc-go")
+	t := template.New(_plugin)
 	for _, tmpl := range templates {
 		_, err := t.Parse(tmpl)
 		if err != nil {
@@ -44,10 +48,14 @@ func parseTemplates(templates ...string) (*template.Template, error) {
 // Generate uses the given *descriptor.FileDescriptorProto to generate
 // YARPC client and server stubs.
 func Generate(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, error) {
-	g := newGenerator()
+	r, err := newRegistry(req)
+	if err != nil {
+		return nil, err
+	}
+	g := newGenerator(r)
+
 	targets := getTargetFiles(req.GetFileToGenerate())
 	var files []*plugin.CodeGeneratorResponse_File
-
 	for _, f := range req.GetProtoFile() {
 		filename := f.GetName()
 		if _, ok := targets[filename]; !ok {
@@ -86,35 +94,7 @@ func (g *generator) execTemplate(data interface{}) ([]byte, error) {
 
 // TODO(mensch): Dummy data used for testing.
 func descriptorToFileData(f *descriptor.FileDescriptorProto) (File, error) {
-	return File{
-		Name:    f.GetName(),
-		Package: "keyvaluepb",
-		Imports: NewImports([]string{
-			"context",
-			"io/ioutil",
-			"github.com/gogo/protobuf/proto",
-			"go.uber.org/fx",
-			"go.uber.org/yarpc/v2/yarpc",
-			"go.uber.org/yarpc/v2/yarpcprotobuf",
-		}...),
-		Services: []Service{
-			{
-				Name:         "KeyValue",
-				UnaryMethods: []Method{},
-				StreamMethods: []StreamMethod{
-					{
-						Method: Method{
-							Name:     "Get",
-							Request:  "GetRequest",
-							Response: "GetResponse",
-						},
-						ClientSide: true,
-						ServerSide: true,
-					},
-				},
-			},
-		},
-	}, nil
+	return File{}, nil
 }
 
 func getTargetFiles(ts []string) map[string]struct{} {
