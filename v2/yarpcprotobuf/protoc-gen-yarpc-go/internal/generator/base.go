@@ -9,7 +9,9 @@ package {{.File.Package.GoPackage}}
 
 {{if .File.Services -}}
   import (
-    {{range .Imports -}}{{printf "%q\n" .}}{{end -}}
+    {{range $importPath, $alias := .Imports -}}
+      {{$alias}} "{{$importPath}}"
+    {{end -}}
   )
 {{end -}}
 

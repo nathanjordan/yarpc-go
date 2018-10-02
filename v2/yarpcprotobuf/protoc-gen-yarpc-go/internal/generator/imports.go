@@ -2,6 +2,7 @@ package generator
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -13,6 +14,8 @@ type Imports map[string]string
 func newImports(paths ...string) Imports {
 	imports := Imports{}
 	for _, path := range paths {
+		os.Stderr.WriteString("Adding path")
+		os.Stderr.WriteString(path)
 		imports.Add(path)
 	}
 	return imports

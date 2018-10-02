@@ -15,6 +15,9 @@ type Data struct {
 
 // File represents a Protobuf file descriptor.
 type File struct {
+	// The embedded FileDescriptorProto is used
+	// to access internal proto types, such as
+	// the file's service definitions.
 	*descriptor.FileDescriptorProto
 
 	Name     string

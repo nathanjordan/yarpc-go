@@ -5,42 +5,43 @@ const _clientTemplate = `
 {{with .File}}
 
 {{range .Services -}}
-{{$svc := .Name}}
+  {{$svc := .Name}}
 
   {{/* Client interface */}}
 
   type {{$svc}}Client interface {
-
-  {{range .Methods -}}
-    {{if (not .ClientStreaming) and (not .ServerStreaming) -}}
-      {{.Name}}(context.Context, {{.Request}}, ...yarpc.CallOption) ({{.Response}}, error)
-    {{else -}}
-      {{.Name}}(context.Context, {{if not .ClientStreaming}}{{.Request}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Response}}Client, error)
+    {{range .Methods -}}
+      {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
+        {{.Name}}(context.Context, {{.Request.Name}}, ...yarpc.CallOption) ({{.Response.Name}}, error)
+      {{else -}}
+        {{.Name}}(context.Context, {{if not .ClientStreaming}}{{.Request.Name}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Response.Name}}Client, error)
+      {{end -}}
     {{end -}}
-  {{end -}}
   }
 
   {{/* Stream client interfaces */}}
 
   {{range .Methods -}}
-    {{if .ClientStreaming or .ServerStreaming}}
+    {{if or .ClientStreaming .ServerStreaming}}
     type {{.Name}}Client interface {
       Context() context.Context
 
     {{if .ClientStreaming -}}
-      Send({{.Request}}, ...yarpc.StreamOption) error
+      Send({{.Request.Name}}, ...yarpc.StreamOption) error
     {{end -}}
 
     {{if .ServerStreaming -}}
-      Recv(...yarpc.StreamOption) ({{.Response}}, error)
+      Recv(...yarpc.StreamOption) ({{.Response.Name}}, error)
       CloseSend(...yarpc.StreamOption) error
     {{end -}}
 
-    {{if .ClientStreaming and (not .ServerStreaming) -}}
-      CloseAndRecv(...yarpc.StreamOption) ({{.Response}}, error)
+    {{if and .ClientStreaming (not .ServerStreaming) -}}
+      CloseAndRecv(...yarpc.StreamOption) ({{.Response.Name}}, error)
     {{end -}}
     }
     {{end -}}
   {{end -}}
-{{end -}}{{end -}}{{end -}}
+{{end -}}
+
+{{end -}}{{end -}}
 `

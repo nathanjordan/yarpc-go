@@ -106,7 +106,8 @@ func (r *registry) getMessage(name string) (*Message, error) {
 func (r *registry) loadFile(f *descriptor.FileDescriptorProto) {
 	pkg := r.newPackage(f)
 	file := &File{
-		Package: pkg,
+		FileDescriptorProto: f,
+		Package:             pkg,
 	}
 	r.files[file.GetName()] = file
 	for _, m := range f.GetMessageType() {
