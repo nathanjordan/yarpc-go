@@ -16,16 +16,16 @@ import (
 // but has been adapted so that it only concerns itself
 // with a minimal feature set.
 type registry struct {
-	Files    map[string]*File
-	Messages map[string]*Message
-	Imports  Imports
+	files    map[string]*File
+	messages map[string]*Message
+	imports  Imports
 }
 
 func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 	r := &registry{
-		Files:    make(map[string]*File),
-		Messages: make(map[string]*Message),
-		Imports: newImports(
+		files:    make(map[string]*File),
+		messages: make(map[string]*Message),
+		imports: newImports(
 			"context",
 			"io/ioutil",
 			"github.com/gogo/protobuf/proto",
@@ -50,7 +50,7 @@ func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 
 	var targetPkg string
 	for _, name := range req.FileToGenerate {
-		target := r.Files[name]
+		target := r.files[name]
 		if target == nil {
 			return fmt.Errorf("file target %q was not registered", name)
 		}
@@ -70,25 +70,38 @@ func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 	return nil
 }
 
-// GetFile returns the File that corresponds to the
-// given name.
-func (r *registry) GetFile(name string) (*File, error) {
-	f, ok := r.Files[name]
+// GetTemplate returns the template data the corresponds
+// to the given filename.
+func (r *registry) GetTemplateData(filename string) (*Data, error) {
+	f, err := r.getFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return &Data{
+		File:    f,
+		Imports: r.imports,
+	}, nil
+}
+
+// getFile returns the File that corresponds to the
+// given filename.
+func (r *registry) getFile(filename string) (*File, error) {
+	f, ok := r.files[filename]
 	if !ok {
-		return nil, fmt.Errorf("file %q was not found", name)
+		return nil, fmt.Errorf("file %q was not found", filename)
 	}
 	return f, nil
 }
 
-// GetMessage returns the Message that corresponds to the
+// getMessage returns the Message that corresponds to the
 // given name. This method expects the input to be formed
 // as an input or output type, such as .foo.Bar.
-func (r *registry) GetMessage(name string) (*Message, error) {
+func (r *registry) getMessage(name string) (*Message, error) {
 	// All input and output types are represented as
 	// .$(Package).$(Message), so we explicitly trim
 	// the leading '.' prefix.
 	msg := strings.TrimPrefix(name, ".")
-	m, ok := r.Messages[msg]
+	m, ok := r.messages[msg]
 	if !ok {
 		return nil, fmt.Errorf("message %q was not found", msg)
 	}
@@ -104,7 +117,7 @@ func (r *registry) loadFile(f *descriptor.FileDescriptorProto) {
 	file := &File{
 		Package: pkg,
 	}
-	r.Files[file.GetName()] = file
+	r.files[file.GetName()] = file
 	for _, m := range f.GetMessageType() {
 		r.loadMessage(file, m)
 	}
@@ -115,7 +128,7 @@ func (r *registry) loadMessage(f *File, m *descriptor.DescriptorProto) {
 		Name:    m.GetName(),
 		Package: f.Package,
 	}
-	r.Messages[msg.FQN()] = msg
+	r.messages[msg.FQN()] = msg
 
 	for _, n := range m.GetNestedType() {
 		r.loadMessage(f, n)
@@ -139,11 +152,11 @@ func (r *registry) loadService(f *File, s *descriptor.ServiceDescriptorProto) er
 }
 
 func (r *registry) newMethod(m *descriptor.MethodDescriptorProto) (*Method, error) {
-	request, err := r.GetMessage(m.GetInputType())
+	request, err := r.getMessage(m.GetInputType())
 	if err != nil {
 		return nil, err
 	}
-	response, err := r.GetMessage(m.GetOutputType())
+	response, err := r.getMessage(m.GetOutputType())
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +175,7 @@ func (r *registry) newPackage(f *descriptor.FileDescriptorProto) *Package {
 		Name:       f.GetPackage(),
 		GoPackage:  goPackage(f),
 		ImportPath: importPath,
-		Alias:      r.Imports.Add(importPath),
+		Alias:      r.imports.Add(importPath),
 	}
 }
 

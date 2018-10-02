@@ -9,7 +9,7 @@ import (
 // Data holds the information required for
 // the protoc-gen-yarpc-go plugin.
 type Data struct {
-	Files   []*File
+	File    *File
 	Imports Imports
 }
 
