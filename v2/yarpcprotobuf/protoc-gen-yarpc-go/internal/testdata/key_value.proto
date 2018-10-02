@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package keyvalue;
+
+message GetRequest {}
+
+message GetResponse {}
+
+service KeyValue {
+	rpc Get(stream GetRequest) returns (GetResponse);
+}
