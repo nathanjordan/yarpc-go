@@ -25,7 +25,14 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 	r := &registry{
 		Files:    make(map[string]*File),
 		Messages: make(map[string]*Message),
-		Imports:  newImports(),
+		Imports: newImports(
+			"context",
+			"io/ioutil",
+			"github.com/gogo/protobuf/proto",
+			"go.uber.org/fx",
+			"go.uber.org/yarpc/v2/yarpc",
+			"go.uber.org/yarpc/v2/yarpcprotobuf",
+		),
 	}
 	return r, r.Load(req)
 }
