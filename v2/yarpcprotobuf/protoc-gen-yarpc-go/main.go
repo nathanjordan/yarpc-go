@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 	"text/template"
 
 	"github.com/gogo/protobuf/proto"
@@ -23,7 +22,7 @@ func main() {
 }
 
 func run(input io.Reader, output io.Writer) error {
-	tmpl := template.Must(parseTemplates(internaltemplate.Client, internaltemplate.Server))
+	tmpl := template.Must(parseTemplates(internaltemplate.Base, internaltemplate.Client, internaltemplate.Server))
 	req, err := fileToGeneratorRequest(input)
 	if err != nil {
 		return fmt.Errorf("failed to create CodeGeneratorRequest: %v", err)
@@ -67,12 +66,15 @@ func generate(req *plugin.CodeGeneratorRequest, t *template.Template) (*plugin.C
 		if err != nil {
 			return nil, err
 		}
+		//os.Stderr.WriteString(fmt.Sprintf("Data %v\n", data))
 		out, err := execTemplate(t, data)
 		if err != nil {
 			return nil, err
 		}
+		//os.Stderr.WriteString(out)
+		outFilename := fmt.Sprintf("%s.yarpc.go", filename)
 		files = append(files, &plugin.CodeGeneratorResponse_File{
-			Name:    &filename,
+			Name:    &outFilename,
 			Content: &out,
 		})
 
@@ -85,6 +87,7 @@ func generate(req *plugin.CodeGeneratorRequest, t *template.Template) (*plugin.C
 func getTemplateData(f *descriptor.FileDescriptorProto) (*internaltemplate.Data, error) {
 	return &internaltemplate.Data{
 		Filename: f.GetName(),
+		Package:  "keyvaluepb",
 		Imports: []string{
 			"context",
 			"io/ioutil",
@@ -129,7 +132,7 @@ func getTargetFiles(ts []string) map[string]struct{} {
 }
 
 func parseTemplates(templates ...string) (*template.Template, error) {
-	t := template.New(path.Base(internaltemplate.Base))
+	t := template.New("protoc-gen-yarpc-go")
 	for _, tmpl := range templates {
 		_, err := t.Parse(tmpl)
 		if err != nil {
