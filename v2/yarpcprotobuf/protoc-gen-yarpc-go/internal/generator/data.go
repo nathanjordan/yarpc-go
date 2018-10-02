@@ -33,17 +33,18 @@ type Package struct {
 
 // Service represents a Protobuf service definition.
 type Service struct {
-	Name          string
-	Package       *Package
-	UnaryMethods  []*Method
-	StreamMethods []*StreamMethod
+	Name    string
+	Package *Package
+	Methods []*Method
 }
 
 // Method represents a standard RPC method.
 type Method struct {
-	Name     string
-	Request  *Message
-	Response *Message
+	Name            string
+	Request         *Message
+	Response        *Message
+	ClientStreaming bool
+	ServerStreaming bool
 }
 
 // Message represents a Protobuf message definition.
@@ -59,13 +60,4 @@ type Message struct {
 // process.
 func (m *Message) FQN() string {
 	return fmt.Sprintf("%s.%s", m.Package.Name, m.Name)
-}
-
-// StreamMethod represents an RPC method with
-// either client-side or server-side streaming.
-type StreamMethod struct {
-	*Method
-
-	ClientStream bool
-	ServerStream bool
 }

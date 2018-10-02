@@ -65,14 +65,13 @@ func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 
 // GetFile returns the File that corresponds to the
 // given name.
-func (r *registry) GetFile(name string) (*Message, error) {
-	m, ok := r.File[name]
+func (r *registry) GetFile(name string) (*File, error) {
+	f, ok := r.Files[name]
 	if !ok {
 		return nil, fmt.Errorf("file %q was not found", name)
 	}
-	return m, nil
+	return f, nil
 }
-
 
 // GetMessage returns the Message that corresponds to the
 // given name. This method expects the input to be formed
@@ -94,13 +93,13 @@ func (r *registry) GetMessage(name string) (*Message, error) {
 // all of the message types potentially referneced in the proto
 // services can reference these types.
 func (r *registry) loadFile(f *descriptor.FileDescriptorProto) {
-	pkg := newPackage(f)
+	pkg := r.newPackage(f)
 	file := &File{
 		Package: pkg,
 	}
 	r.Files[file.GetName()] = file
 	for _, m := range f.GetMessageType() {
-		r.loadMessage(m, pkg)
+		r.loadMessage(file, m)
 	}
 }
 
@@ -109,11 +108,10 @@ func (r *registry) loadMessage(f *File, m *descriptor.DescriptorProto) {
 		Name:    m.GetName(),
 		Package: f.Package,
 	}
-	f.Messages = append(file.Messages, msg)
 	r.Messages[msg.FQN()] = msg
 
 	for _, n := range m.GetNestedType() {
-		r.loadMessage(f, m.GetNestedType())
+		r.loadMessage(f, n)
 	}
 }
 
@@ -143,9 +141,11 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto) (*Method, erro
 		return nil, err
 	}
 	return &Method{
-		Name:     m.GetName(),
-		Request:  request,
-		Response: response,
+		Name:            m.GetName(),
+		Request:         request,
+		Response:        response,
+		ClientStreaming: m.GetClientStreaming(),
+		ServerStreaming: m.GetServerStreaming(),
 	}, nil
 }
 
@@ -190,10 +190,10 @@ func goPackage(f *descriptor.FileDescriptorProto) string {
 //
 //   option go_package = "gen/proto:bazpb";
 //   -> "gen/proto"
-func (r *registry) importPath(f *descriptor.FileDescriptorProto) string {
+func importPath(f *descriptor.FileDescriptorProto) string {
 	gopkg := f.Options.GetGoPackage()
 	if idx := strings.LastIndex(gopkg, "/"); idx >= 0 {
 		return gopkg[:idx]
 	}
-	return filepath.Dir(f.Name())
+	return filepath.Dir(f.GetName())
 }
