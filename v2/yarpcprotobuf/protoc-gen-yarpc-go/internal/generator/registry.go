@@ -38,7 +38,7 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 }
 
 // Load registers all of the Proto types provided in the CodeGeneratorRequest
-// with the registry. Note that all CodeGeneratorRequests MUST only request
+// with the registry. Note that all CodeGeneratorRequests SHOULD only request
 // to generate a single go package. Otherwise, multiple go packages will
 // be deposited in the same directory and will therefore not compile. This
 // is synonymous to the protoc-gen-go plugin, so we implement the same
@@ -47,19 +47,10 @@ func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 	for _, f := range req.GetProtoFile() {
 		r.loadFile(f)
 	}
-
-	var targetPkg string
 	for _, name := range req.FileToGenerate {
-		target := r.files[name]
-		if target == nil {
+		target, ok := r.files[name]
+		if !ok {
 			return fmt.Errorf("file target %q was not registered", name)
-		}
-		pkg := target.Package.Name
-		if targetPkg == "" {
-			targetPkg = pkg
-		}
-		if targetPkg != pkg {
-			return fmt.Errorf("cannot generate multiple go packages: found %q and %q", targetPkg, pkg)
 		}
 		for _, s := range target.GetService() {
 			if err := r.loadService(target, s); err != nil {
@@ -128,7 +119,7 @@ func (r *registry) loadMessage(f *File, m *descriptor.DescriptorProto) {
 		Name:    m.GetName(),
 		Package: f.Package,
 	}
-	r.messages[msg.FQN()] = msg
+	r.messages[msg.key()] = msg
 
 	for _, n := range m.GetNestedType() {
 		r.loadMessage(f, n)

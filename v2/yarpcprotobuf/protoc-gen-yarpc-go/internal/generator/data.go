@@ -53,11 +53,10 @@ type Message struct {
 	Package *Package
 }
 
-// FQN returns the fully-qualified name for the
-// given message type. This is used to uniquely
-// represent the message type so that it can
-// be referenced throughout the code generation
+// key returns the unique key for the given message type.
+// This is used to uniquely represent the message type so
+// that it can be referenced throughout the code generation
 // process.
-func (m *Message) FQN() string {
+func (m *Message) key() string {
 	return fmt.Sprintf("%s.%s", m.Package.Name, m.Name)
 }
