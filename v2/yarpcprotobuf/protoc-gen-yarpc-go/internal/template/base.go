@@ -10,10 +10,10 @@ package {{.Package}}
 
 {{if .Services -}}
 import (
-  {{range $i := .Imports -}}{{$i | printf "%s\n"}}{{end -}}
+  {{range .Imports -}}{{printf "%q\n" .}}{{end -}}
 )
 {{end -}}
 
-{{template "client" -}}
-{{template "server" -}}
+{{template "client" . -}}
+{{template "server" . -}}
 `

@@ -5,35 +5,35 @@ const Server = `
 {{define "server" -}}
 
 {{/* Service interfaces */}}
-{{range s := .Services -}}
-{{$svc := $s.Name}}
+{{range .Services -}}
+{{$svc := .Name}}
 
 type {{$svc}}Server interface {
 
-{{range m := $s.UnaryMethods -}}
-  {{$m.Name}}(context.Context, {{$m.Request}}) ({{$m.Response}}, error)
+{{range .UnaryMethods -}}
+  {{.Name}}(context.Context, {{.Request}}) ({{.Response}}, error)
 {{end -}}
 
-{{range m := $s.StreamMethods -}}
-  {{$m.Name}}({{if not .ClientSide}}{{$m.Request}},{{end -}} {{$svc}}{{$m.Name}}Server) ({{if not .ServerSide}}{{$m.Response}},{{end -}} error)
+{{range .StreamMethods -}}
+  {{.Name}}({{if not .ClientSide}}{{.Request}},{{end -}} {{$svc}}{{.Name}}Server) ({{if not .ServerSide}}{{.Response}},{{end -}} error)
 {{end -}}
 
 }
 {{end -}}
 
 {{/* Stream server interfaces */}}
-{{range s := .Services -}}
+{{range .Services -}}
 
-{{range m := $s.StreamMethods -}}
-type {{$m.Name}}Server interface {
+{{range .StreamMethods -}}
+type {{.Name}}Server interface {
   Context() context.Context
 
-  {{if $m.ClientSide -}}
-  Recv({...yarpc.StreamOption) ({{$m.Request}}, error)
+  {{if .ClientSide -}}
+  Recv(...yarpc.StreamOption) ({{.Request}}, error)
   {{end -}}
 
-  {{if $m.ServerSide -}}
-  Send({{$m.Response}}, ...yarpc.StreamOption) error
+  {{if .ServerSide -}}
+  Send({{.Response}}, ...yarpc.StreamOption) error
   {{end -}}
 }
 {{end -}}{{end -}}{{end -}}

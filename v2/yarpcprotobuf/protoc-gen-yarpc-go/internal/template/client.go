@@ -5,40 +5,40 @@ const Client = `
 {{define "client" -}}
 
 {{/* Client interfaces */}}
-{{range s := .Services -}}
-{{$svc := $s.Name}}
+{{range .Services -}}
+{{$svc := .Name}}
 
 type {{$svc}}Client interface {
 
-{{range m := $s.UnaryMethods -}}
-  {{$m.Name}}(context.Context, {{$m.Request}}, ...yarpc.CallOption) ({{$m.Response}}, error)
+{{range .UnaryMethods -}}
+  {{.Name}}(context.Context, {{.Request}}, ...yarpc.CallOption) ({{.Response}}, error)
 {{end -}}
 
-{{range m := $s.StreamMethods -}}
-  {{$m.Name}}(context.Context, {{if not .ClientSide}}{{$m.Request}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{$m.Response}}Client, error)
+{{range .StreamMethods -}}
+  {{.Name}}(context.Context, {{if not .ClientSide}}{{.Request}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Response}}Client, error)
 {{end -}}
 
 }
 {{end -}}
 
 {{/* Stream client interfaces */}}
-{{range s := .Services -}}
+{{range .Services -}}
 
-{{range m := $s.StreamMethods -}}
-type {{$m.Name}}Client interface {
+{{range .StreamMethods -}}
+type {{.Name}}Client interface {
   Context() context.Context
 
-  {{if $m.ClientSide -}}
-  Send({{$m.Request}}, ...yarpc.StreamOption) error
+  {{if .ClientSide -}}
+  Send({{.Request}}, ...yarpc.StreamOption) error
   {{end -}}
 
-  {{if $m.ServerSide -}}
-  Recv(...yarpc.StreamOption) ({{$m.Response}}, error)
+  {{if .ServerSide -}}
+  Recv(...yarpc.StreamOption) ({{.Response}}, error)
   CloseSend(...yarpc.StreamOption) error
   {{end -}}
 
-  {{if $m.ClientSide and not $m.ServerSide -}}
-  CloseAndRecv(...yarpc.StreamOption) ({{$m.Response}}, error)
+  {{if (not .ClientSide) and (not .ServerSide) -}}
+  CloseAndRecv(...yarpc.StreamOption) ({{.Response}}, error)
   {{end -}}
 }
 {{end -}}{{end -}}{{end -}}

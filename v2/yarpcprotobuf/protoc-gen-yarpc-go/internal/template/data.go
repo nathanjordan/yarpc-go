@@ -4,6 +4,7 @@ package template
 // protoc-gen-yarpc-go templates.
 type Data struct {
 	Filename string
+	Package  string
 	Imports  []string
 	Services []Service
 }
