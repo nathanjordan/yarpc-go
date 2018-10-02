@@ -1,7 +1,6 @@
-package template
+package generator
 
-// Client represents the generated client code.
-const Client = `
+const _clientTemplate = `
 {{define "client" -}}
 
 {{/* Client interfaces */}}

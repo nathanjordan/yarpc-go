@@ -1,17 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"text/template"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	plugin "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
-	internaltemplate "go.uber.org/yarpc/v2/yarpcprotobuf/protoc-gen-yarpc-go/internal/template"
+	"go.uber.org/yarpc/v2/yarpcprotobuf/protoc-gen-yarpc-go/internal/generator"
 )
 
 func main() {
@@ -22,13 +19,12 @@ func main() {
 }
 
 func run(input io.Reader, output io.Writer) error {
-	tmpl := template.Must(parseTemplates(internaltemplate.Base, internaltemplate.Client, internaltemplate.Server))
 	req, err := fileToGeneratorRequest(input)
 	if err != nil {
 		return fmt.Errorf("failed to create CodeGeneratorRequest: %v", err)
 	}
 
-	res, err := generate(req, tmpl)
+	res, err := generator.Generate(req)
 	if err != nil {
 		return fmt.Errorf("failed to create CodeGeneratorResponse: %v", err)
 	}
@@ -52,100 +48,4 @@ func fileToGeneratorRequest(r io.Reader) (*plugin.CodeGeneratorRequest, error) {
 	}
 	req := &plugin.CodeGeneratorRequest{}
 	return req, proto.Unmarshal(in, req)
-}
-
-func generate(req *plugin.CodeGeneratorRequest, t *template.Template) (*plugin.CodeGeneratorResponse, error) {
-	var files []*plugin.CodeGeneratorResponse_File
-	targets := getTargetFiles(req.GetFileToGenerate())
-	for _, f := range req.GetProtoFile() {
-		filename := f.GetName()
-		if _, ok := targets[filename]; !ok {
-			continue
-		}
-		data, err := getTemplateData(f)
-		if err != nil {
-			return nil, err
-		}
-		//os.Stderr.WriteString(fmt.Sprintf("Data %v\n", data))
-		out, err := execTemplate(t, data)
-		if err != nil {
-			return nil, err
-		}
-		//os.Stderr.WriteString(out)
-		outFilename := fmt.Sprintf("%s.yarpc.go", filename)
-		files = append(files, &plugin.CodeGeneratorResponse_File{
-			Name:    &outFilename,
-			Content: &out,
-		})
-
-	}
-	return &plugin.CodeGeneratorResponse{
-		File: files,
-	}, nil
-}
-
-func getTemplateData(f *descriptor.FileDescriptorProto) (*internaltemplate.Data, error) {
-	return &internaltemplate.Data{
-		Filename: f.GetName(),
-		Package:  "keyvaluepb",
-		Imports: []string{
-			"context",
-			"io/ioutil",
-			"reflect",
-			"github.com/gogo/protobuf/proto",
-			"go.uber.org/fx",
-			"go.uber.org/v2/yarpc",
-			"go.uber.org/yarpc/v2/yarpcprotobuf",
-		},
-		Services: []internaltemplate.Service{
-			{
-				Name: "Foo",
-				UnaryMethods: []internaltemplate.Method{
-					{
-						Name:     "FooMethod",
-						Request:  "FooRequest",
-						Response: "FooResponse",
-					},
-				},
-				StreamMethods: []internaltemplate.StreamMethod{
-					{
-						Method: internaltemplate.Method{
-							Name:     "BarMethod",
-							Request:  "BarRequest",
-							Response: "BarResponse",
-						},
-						ClientSide: true,
-						ServerSide: true,
-					},
-				},
-			},
-		},
-	}, nil
-}
-
-func getTargetFiles(ts []string) map[string]struct{} {
-	m := make(map[string]struct{}, len(ts))
-	for _, t := range ts {
-		m[t] = struct{}{}
-	}
-	return m
-}
-
-func parseTemplates(templates ...string) (*template.Template, error) {
-	t := template.New("protoc-gen-yarpc-go")
-	for _, tmpl := range templates {
-		_, err := t.Parse(tmpl)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return t, nil
-}
-
-func execTemplate(tmpl *template.Template, data interface{}) (string, error) {
-	buffer := bytes.NewBuffer(nil)
-	if err := tmpl.Execute(buffer, data); err != nil {
-		return "", err
-	}
-	return buffer.String(), nil
 }

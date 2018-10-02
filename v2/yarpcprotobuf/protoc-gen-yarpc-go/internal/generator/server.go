@@ -1,7 +1,6 @@
-package template
+package generator
 
-// Server represents the generated server code.
-const Server = `
+const _serverTemplate = `
 {{define "server" -}}
 
 {{/* Service interfaces */}}

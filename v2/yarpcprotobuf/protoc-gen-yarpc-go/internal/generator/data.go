@@ -1,4 +1,4 @@
-package template
+package generator
 
 // Data holds the information referenced in the
 // protoc-gen-yarpc-go templates.

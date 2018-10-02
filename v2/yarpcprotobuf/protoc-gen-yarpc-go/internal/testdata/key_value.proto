@@ -7,5 +7,5 @@ message GetRequest {}
 message GetResponse {}
 
 service KeyValue {
-	rpc Get(stream GetRequest) returns (GetResponse);
+	rpc Get(stream GetRequest) returns (stream GetResponse);
 }
