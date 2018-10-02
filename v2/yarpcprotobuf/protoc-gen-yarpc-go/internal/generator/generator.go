@@ -53,7 +53,7 @@ func Generate(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, 
 		if _, ok := targets[filename]; !ok {
 			continue
 		}
-		data, err := getData(f)
+		data, err := descriptorToFileData(f)
 		if err != nil {
 			return nil, err
 		}
@@ -85,18 +85,18 @@ func (g *generator) execTemplate(data interface{}) ([]byte, error) {
 }
 
 // TODO(mensch): Dummy data used for testing.
-func getData(f *descriptor.FileDescriptorProto) (*Data, error) {
-	return &Data{
-		Filename: f.GetName(),
-		Package:  "keyvaluepb",
-		Imports: []string{
+func descriptorToFileData(f *descriptor.FileDescriptorProto) (File, error) {
+	return File{
+		Name:    f.GetName(),
+		Package: "keyvaluepb",
+		Imports: NewImports([]string{
 			"context",
 			"io/ioutil",
 			"github.com/gogo/protobuf/proto",
 			"go.uber.org/fx",
 			"go.uber.org/yarpc/v2/yarpc",
 			"go.uber.org/yarpc/v2/yarpcprotobuf",
-		},
+		}...),
 		Services: []Service{
 			{
 				Name:         "KeyValue",

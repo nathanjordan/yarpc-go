@@ -1,11 +1,10 @@
 package generator
 
-// Data holds the information referenced in the
-// protoc-gen-yarpc-go templates.
-type Data struct {
-	Filename string
+// File represents a Protobuf file descriptor.
+type File struct {
+	Name     string
 	Package  string
-	Imports  []string
+	Imports  Imports
 	Services []Service
 }
 
