@@ -6,11 +6,6 @@ import (
 	"text/template"
 )
 
-const (
-	_clientStream = "ClientStream"
-	_serverStream = "ServerStream"
-)
-
 var _tmpl = template.Must(
 	parseTemplates(
 		_baseTemplate,
@@ -22,7 +17,9 @@ var _tmpl = template.Must(
 func parseTemplates(templates ...string) (*template.Template, error) {
 	t := template.New(_plugin).Funcs(
 		template.FuncMap{
-			"goType": goType,
+			"goType":        goType,
+			"unaryMethods":  unaryMethods,
+			"streamMethods": streamMethods,
 		},
 	)
 	for _, tmpl := range templates {
@@ -51,4 +48,24 @@ func goType(m *Message, pkg string) string {
 		name = fmt.Sprintf("%s.%s", m.Package.Alias, m.Name)
 	}
 	return fmt.Sprintf("*%s", name)
+}
+
+func unaryMethods(s *Service) []*Method {
+	methods := make([]*Method, 0, len(s.Methods))
+	for _, m := range s.Methods {
+		if !m.ClientStreaming && !m.ServerStreaming {
+			methods = append(methods, m)
+		}
+	}
+	return methods
+}
+
+func streamMethods(s *Service) []*Method {
+	methods := make([]*Method, 0, len(s.Methods))
+	for _, m := range s.Methods {
+		if m.ClientStreaming || m.ServerStreaming {
+			methods = append(methods, m)
+		}
+	}
+	return methods
 }

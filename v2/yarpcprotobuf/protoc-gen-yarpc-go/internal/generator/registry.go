@@ -9,6 +9,14 @@ import (
 	plugin "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 )
 
+const (
+	_clientStream = "ClientStream"
+	_serverStream = "ServerStream"
+
+	_request  = "Request"
+	_response = "Response"
+)
+
 // registry is used to collect and register all
 // of the Protobuf types relevant for
 // protoc-gen-yarpc-go. This concept is inspired
@@ -151,15 +159,18 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 	if err != nil {
 		return nil, err
 	}
+	name := m.GetName()
 	return &Method{
-		Name:            m.GetName(),
+		Name:            name,
 		Service:         svc,
 		Request:         request,
 		Response:        response,
 		ClientStreaming: m.GetClientStreaming(),
 		ServerStreaming: m.GetServerStreaming(),
-		ClientStream:    streamInterface(svc, m.GetName(), _clientStream),
-		ServerStream:    streamInterface(svc, m.GetName(), _serverStream),
+		ClientStream:    streamInterface(svc, name, _clientStream),
+		ServerStream:    streamInterface(svc, name, _serverStream),
+		RequestType:     parameterType(svc, name, _request),
+		ResponseType:    parameterType(svc, name, _response),
 	}, nil
 }
 
@@ -218,7 +229,24 @@ func importPath(f *descriptor.FileDescriptorProto) string {
 //  service Foo {
 //    Bar(stream BarRequest) returns (BarResponse)
 //
-//  -> FooBarClientStream
+//  -> FooBarClientStream / FooBarServerStream
 func streamInterface(service, method, stream string) string {
-	return strings.Join([]string{service, method, stream}, "")
+	return join(service, method, stream)
+}
+
+// parameterType constructs a parameter type name
+// from the given method and service name, appending the
+// parameter type as a suffix.
+//
+//  Ex:
+//  service Foo {
+//    Bar(stream BarRequest) returns (BarResponse)
+//
+//  -> FooBarRequest / FooBarResponse
+func parameterType(service, method, parameter string) string {
+	return join(service, method, parameter)
+}
+
+func join(s ...string) string {
+	return strings.Join(s, "")
 }

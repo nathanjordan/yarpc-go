@@ -10,7 +10,6 @@ import (
 	fx "go.uber.org/fx"
 	yarpc "go.uber.org/yarpc/v2/yarpc"
 	yarpcprotobuf "go.uber.org/yarpc/v2/yarpcprotobuf"
-	ioutil "io/ioutil"
 )
 
 // KeyValueClient is the KeyValue service's client interface.
@@ -100,6 +99,18 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 	return yarpcprotobuf.Procedures(
 		yarpcprotobuf.ProceduresParams{
 			Service: "KeyValue",
+			Unary: []yarpcprotobuf.UnaryProceduresParams{
+
+				{
+					MethodName: "Foo",
+					Handler: yarpcprotobuf.NewUnaryHandler{
+						yarpcprotobuf.UnaryHandlerParams{
+							Handle: h.Foo,
+							Create: newKeyValueFooRequest(),
+						},
+					},
+				},
+			},
 		},
 	)
 }

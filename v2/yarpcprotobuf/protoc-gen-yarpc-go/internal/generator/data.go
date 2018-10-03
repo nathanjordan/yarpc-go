@@ -45,8 +45,13 @@ type Method struct {
 	Response        *Message
 	ClientStreaming bool
 	ServerStreaming bool
-	ClientStream    string
-	ServerStream    string
+
+	/* Template data */
+	ClientStream string
+	ServerStream string
+
+	RequestType  string
+	ResponseType string
 }
 
 // Message represents a Protobuf message definition.
