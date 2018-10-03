@@ -11,10 +11,16 @@ const _clientTemplate = `
 
   type {{$svc}}Client interface {
     {{range .Methods -}}
-      {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
+      {{if not .ClientStreaming -}}
         {{.Name}}(context.Context, {{.Request.Name}}, ...yarpc.CallOption) ({{.Response.Name}}, error)
       {{else -}}
-        {{.Name}}(context.Context, {{if not .ClientStreaming}}{{.Request.Name}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Name}}ClientStream, error)
+        {{.Name}}(
+          context.Context,
+          {{if not .ClientStreaming -}}
+            {{.Request.Name}},
+          {{end -}}
+          ...yarpc.CallOption,
+        ) ({{$svc}}{{.Name}}ClientStream, error)
       {{end -}}
     {{end -}}
   }

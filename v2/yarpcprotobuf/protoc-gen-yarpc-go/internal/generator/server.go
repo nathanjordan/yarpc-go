@@ -8,17 +8,18 @@ const _serverTemplate = `
   {{$svc := .Name}}
 
   {{/* Service interface */}}
+
   type {{$svc}}Server interface {
     {{range .Methods -}}
       {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
         {{.Name}}(context.Context, {{.Request.Name}}) ({{.Response.Name}}, error)
       {{else -}}
         {{.Name}}(
-          {{if not .ClientStreaming}}
+          {{if not .ClientStreaming -}}
             {{.Request.Name}},
           {{end -}}
           {{$svc}}{{.Name}}ServerStream,
-        ) {{if not .ServerStreaming -}} ({{$svc}}{{.Name}}ServerStream, error) {{else -}} error {{end -}}
+        ) {{if not .ServerStreaming}} ({{$svc}}{{.Name}}ServerStream, error) {{else}} error {{end}}
       {{end -}}
     {{end -}}
   }

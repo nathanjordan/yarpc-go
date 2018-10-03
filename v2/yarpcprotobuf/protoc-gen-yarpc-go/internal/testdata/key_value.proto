@@ -7,7 +7,8 @@ message GetRequest {}
 message GetResponse {}
 
 service KeyValue {
-	rpc ClientStream(stream GetRequest) returns (GetResponse);
-	rpc ServerStream(GetRequest) returns (stream GetResponse);
-	rpc BidirectionalStream(stream GetRequest) returns (stream GetResponse);
+	rpc Foo(GetRequest) returns (GetResponse);
+	rpc Bar(stream GetRequest) returns (GetResponse);
+	rpc Baz(GetRequest) returns (stream GetResponse);
+	rpc Qux(stream GetRequest) returns (stream GetResponse);
 }
