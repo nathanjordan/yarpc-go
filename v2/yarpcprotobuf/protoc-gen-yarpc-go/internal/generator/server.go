@@ -12,18 +12,18 @@ const _serverTemplate = `
 
   type {{$svc}}Server interface {
     {{range .Methods -}}
-      {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
-        {{.Name}}(
-          context.Context,
-          {{goType .Request $gopkg}},
-        ) ({{goType .Response $gopkg}}, error)
-      {{else -}}
+      {{if or .ClientStreaming .ServerStreaming -}}
         {{.Name}}(
           {{if not .ClientStreaming -}}
             {{goType .Request $gopkg}},
           {{end -}}
           {{.ServerStream}},
         ) {{if not .ServerStreaming}} ({{.ServerStream}}, error) {{else}} error {{end}}
+      {{else -}}
+        {{.Name}}(
+          context.Context,
+          {{goType .Request $gopkg}},
+        ) ({{goType .Response $gopkg}}, error)
       {{end -}}
     {{end -}}
   }

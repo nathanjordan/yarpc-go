@@ -159,8 +159,8 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 		Response:        response,
 		ClientStreaming: m.GetClientStreaming(),
 		ServerStreaming: m.GetServerStreaming(),
-		ClientStream:    streamingInterface(svc, m.GetName(), _clientStream),
-		ServerStream:    streamingInterface(svc, m.GetName(), _serverStream),
+		ClientStream:    streamInterface(svc, m.GetName(), _clientStream),
+		ServerStream:    streamInterface(svc, m.GetName(), _serverStream),
 	}, nil
 }
 
@@ -211,7 +211,7 @@ func importPath(f *descriptor.FileDescriptorProto) string {
 	return filepath.Dir(f.GetName())
 }
 
-// streamingInterface constructs a streaming interface name
+// streamInterface constructs a stream interface name
 // from the given method and service name, appending the
 // stream type as a suffix.
 //
@@ -220,6 +220,6 @@ func importPath(f *descriptor.FileDescriptorProto) string {
 //    Bar(stream BarRequest) returns (BarResponse)
 //
 //  -> FooBarClientStream
-func streamingInterface(service, method, stream string) string {
+func streamInterface(service, method, stream string) string {
 	return strings.Join([]string{service, method, stream}, "")
 }

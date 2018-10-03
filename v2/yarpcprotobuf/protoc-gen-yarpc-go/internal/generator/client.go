@@ -12,13 +12,7 @@ const _clientTemplate = `
 
   type {{$svc}}Client interface {
     {{range .Methods -}}
-      {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
-        {{.Name}}(
-          context.Context,
-          {{goType .Request $gopkg}},
-          ...yarpc.CallOption,
-        ) ({{goType .Response $gopkg}}, error)
-      {{else -}}
+      {{if or .ClientStreaming .ServerStreaming -}}
         {{.Name}}(
           context.Context,
           {{if not .ClientStreaming -}}
@@ -26,6 +20,12 @@ const _clientTemplate = `
           {{end -}}
           ...yarpc.CallOption,
         ) ({{.ClientStream}}, error)
+      {{else -}}
+        {{.Name}}(
+          context.Context,
+          {{goType .Request $gopkg}},
+          ...yarpc.CallOption,
+        ) ({{goType .Response $gopkg}}, error)
       {{end -}}
     {{end -}}
   }
