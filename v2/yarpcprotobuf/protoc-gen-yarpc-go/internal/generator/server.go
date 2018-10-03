@@ -3,6 +3,7 @@ package generator
 const _serverTemplate = `
 {{define "server" -}}
 {{with .File}}
+{{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
   {{$svc := .Name}}
@@ -14,15 +15,15 @@ const _serverTemplate = `
       {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
         {{.Name}}(
           context.Context,
-          {{.Request.Name}},
-        ) ({{.Response.Name}}, error)
+          {{goType .Request $gopkg}},
+        ) ({{goType .Response $gopkg}}, error)
       {{else -}}
         {{.Name}}(
           {{if not .ClientStreaming -}}
-            {{.Request.Name}},
+            {{goType .Request $gopkg}},
           {{end -}}
-          {{$svc}}{{.Name}}ServerStream,
-        ) {{if not .ServerStreaming}} ({{$svc}}{{.Name}}ServerStream, error) {{else}} error {{end}}
+          {{serverStream .}},
+        ) {{if not .ServerStreaming}} ({{serverStream .}}, error) {{else}} error {{end}}
       {{end -}}
     {{end -}}
   }
@@ -32,13 +33,13 @@ const _serverTemplate = `
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type {{$svc}}{{.Name}}ServerStream interface {
+    type {{serverStream .}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
-      Recv(...yarpc.StreamOption) ({{.Request.Name}}, error)
+      Recv(...yarpc.StreamOption) ({{goType .Request $gopkg}}, error)
     {{end -}}
     {{if .ServerStreaming -}}
-      Send({{.Response.Name}}, ...yarpc.StreamOption) error
+      Send({{goType .Response $gopkg}}, ...yarpc.StreamOption) error
     {{end -}}
     }
     {{end -}}

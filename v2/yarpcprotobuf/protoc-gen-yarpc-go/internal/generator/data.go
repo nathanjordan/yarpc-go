@@ -41,6 +41,7 @@ type Service struct {
 // Method represents a standard RPC method.
 type Method struct {
 	Name            string
+	Service         string
 	Request         *Message
 	Response        *Message
 	ClientStreaming bool

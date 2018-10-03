@@ -16,16 +16,16 @@ import (
 type KeyValueClient interface {
 	Foo(
 		context.Context,
-		GetRequest,
+		*GetRequest,
 		...yarpc.CallOption,
-	) (GetResponse, error)
+	) (*GetResponse, error)
 	Bar(
 		context.Context,
 		...yarpc.CallOption,
 	) (KeyValueBarClientStream, error)
 	Baz(
 		context.Context,
-		GetRequest,
+		*GetRequest,
 		...yarpc.CallOption,
 	) (KeyValueBazClientStream, error)
 	Qux(
@@ -36,33 +36,33 @@ type KeyValueClient interface {
 
 type KeyValueBarClientStream interface {
 	Context() context.Context
-	Send(GetRequest, ...yarpc.StreamOption) error
-	CloseAndRecv(...yarpc.StreamOption) (GetResponse, error)
+	Send(*GetRequest, ...yarpc.StreamOption) error
+	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
 }
 
 type KeyValueBazClientStream interface {
 	Context() context.Context
-	Recv(...yarpc.StreamOption) (GetResponse, error)
+	Recv(...yarpc.StreamOption) (*GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
 type KeyValueQuxClientStream interface {
 	Context() context.Context
-	Send(GetRequest, ...yarpc.StreamOption) error
-	Recv(...yarpc.StreamOption) (GetResponse, error)
+	Send(*GetRequest, ...yarpc.StreamOption) error
+	Recv(...yarpc.StreamOption) (*GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
 type KeyValueServer interface {
 	Foo(
 		context.Context,
-		GetRequest,
-	) (GetResponse, error)
+		*GetRequest,
+	) (*GetResponse, error)
 	Bar(
 		KeyValueBarServerStream,
 	) (KeyValueBarServerStream, error)
 	Baz(
-		GetRequest,
+		*GetRequest,
 		KeyValueBazServerStream,
 	) error
 	Qux(
@@ -72,16 +72,16 @@ type KeyValueServer interface {
 
 type KeyValueBarServerStream interface {
 	Context() context.Context
-	Recv(...yarpc.StreamOption) (GetRequest, error)
+	Recv(...yarpc.StreamOption) (*GetRequest, error)
 }
 
 type KeyValueBazServerStream interface {
 	Context() context.Context
-	Send(GetResponse, ...yarpc.StreamOption) error
+	Send(*GetResponse, ...yarpc.StreamOption) error
 }
 
 type KeyValueQuxServerStream interface {
 	Context() context.Context
-	Recv(...yarpc.StreamOption) (GetRequest, error)
-	Send(GetResponse, ...yarpc.StreamOption) error
+	Recv(...yarpc.StreamOption) (*GetRequest, error)
+	Send(*GetResponse, ...yarpc.StreamOption) error
 }

@@ -3,6 +3,7 @@ package generator
 const _clientTemplate = `
 {{define "client" -}}
 {{with .File}}
+{{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
   {{$svc := .Name}}
@@ -14,17 +15,17 @@ const _clientTemplate = `
       {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
         {{.Name}}(
           context.Context,
-          {{.Request.Name}},
+          {{goType .Request $gopkg}},
           ...yarpc.CallOption,
-        ) ({{.Response.Name}}, error)
+        ) ({{goType .Response $gopkg}}, error)
       {{else -}}
         {{.Name}}(
           context.Context,
           {{if not .ClientStreaming -}}
-            {{.Request.Name}},
+            {{goType .Request $gopkg}},
           {{end -}}
           ...yarpc.CallOption,
-        ) ({{$svc}}{{.Name}}ClientStream, error)
+        ) ({{clientStream .}}, error)
       {{end -}}
     {{end -}}
   }
@@ -33,17 +34,17 @@ const _clientTemplate = `
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type {{$svc}}{{.Name}}ClientStream interface {
+    type {{clientStream .}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
-      Send({{.Request.Name}}, ...yarpc.StreamOption) error
+      Send({{goType .Request $gopkg}}, ...yarpc.StreamOption) error
     {{end -}}
     {{if .ServerStreaming -}}
-      Recv(...yarpc.StreamOption) ({{.Response.Name}}, error)
+      Recv(...yarpc.StreamOption) ({{goType .Response $gopkg}}, error)
       CloseSend(...yarpc.StreamOption) error
     {{end -}}
     {{if and .ClientStreaming (not .ServerStreaming) -}}
-      CloseAndRecv(...yarpc.StreamOption) ({{.Response.Name}}, error)
+      CloseAndRecv(...yarpc.StreamOption) ({{goType .Response $gopkg}}, error)
     {{end -}}
     }
     {{end -}}
