@@ -93,3 +93,17 @@ type KeyValueQuxServerStream interface {
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
 	Send(*GetResponse, ...yarpc.StreamOption) error
 }
+
+// BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
+func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
+	h := &_KeyValueHandler{server: s}
+	return yarpcprotobuf.Procedures(
+		yarpcprotobuf.ProceduresParams{
+			Service: "KeyValue",
+		},
+	)
+}
+
+type _KeyValueHandler struct {
+	server KeyValueServer
+}

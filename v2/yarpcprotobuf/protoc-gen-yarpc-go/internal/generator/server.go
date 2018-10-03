@@ -47,7 +47,8 @@ const _serverTemplate = `
     {{end -}}
   {{end -}}
 
-  func Build<$svc>Procedures(s {{$svc}}Server) []yarpc.Procedure {
+  // Build{{$svc}}Procedures constructs the YARPC procedures for the {{$svc}} service.
+  func Build{{$svc}}Procedures(s {{$svc}}Server) []yarpc.Procedure {
     h := &_{{$svc}}Handler{server: s}
     return yarpcprotobuf.Procedures(
       yarpcprotobuf.ProceduresParams{
