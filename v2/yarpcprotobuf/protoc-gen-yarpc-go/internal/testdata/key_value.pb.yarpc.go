@@ -111,6 +111,35 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 					},
 				},
 			},
+			Stream: []yarpcprotobuf.StreamProceduresParams{
+
+				{
+					MethodName: "Bar",
+					Handler: yarpcprotobuf.NewStreamHandler{
+						yarpcprotobuf.StreamHandlerParams{
+							Handle: h.Bar,
+						},
+					},
+				},
+
+				{
+					MethodName: "Baz",
+					Handler: yarpcprotobuf.NewStreamHandler{
+						yarpcprotobuf.StreamHandlerParams{
+							Handle: h.Baz,
+						},
+					},
+				},
+
+				{
+					MethodName: "Qux",
+					Handler: yarpcprotobuf.NewStreamHandler{
+						yarpcprotobuf.StreamHandlerParams{
+							Handle: h.Qux,
+						},
+					},
+				},
+			},
 		},
 	)
 }

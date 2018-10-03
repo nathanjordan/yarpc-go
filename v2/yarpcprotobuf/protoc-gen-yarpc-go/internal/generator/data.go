@@ -33,6 +33,7 @@ type Package struct {
 // Service represents a Protobuf service definition.
 type Service struct {
 	Name    string
+	FQN     string
 	Package *Package
 	Methods []*Method
 }

@@ -58,15 +58,27 @@ const _serverTemplate = `
         Unary: []yarpcprotobuf.UnaryProceduresParams{
           {{range unaryMethods .}}
           {
-             MethodName: {{printf "%q" .Name}},
-             Handler: yarpcprotobuf.NewUnaryHandler{
-               yarpcprotobuf.UnaryHandlerParams{
-				   Handle: h.{{.Name}},
-				   Create: new{{$svc}}{{.Name}}Request(),
-			   },
-             },
-		  },
-		  {{end -}}
+            MethodName: {{printf "%q" .Name}},
+            Handler: yarpcprotobuf.NewUnaryHandler{
+              yarpcprotobuf.UnaryHandlerParams{
+                Handle: h.{{.Name}},
+                Create: new{{$svc}}{{.Name}}Request(),
+              },
+            },
+          },
+          {{end -}}
+        },
+        Stream: []yarpcprotobuf.StreamProceduresParams{
+          {{range streamMethods .}}
+          {
+            MethodName: {{printf "%q" .Name}},
+            Handler: yarpcprotobuf.NewStreamHandler{
+              yarpcprotobuf.StreamHandlerParams{
+                Handle: h.{{.Name}},
+              },
+            },
+          },
+          {{end -}}
         },
       },
     )

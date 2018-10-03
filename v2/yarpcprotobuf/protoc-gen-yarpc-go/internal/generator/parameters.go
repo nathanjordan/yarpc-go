@@ -9,12 +9,14 @@ const _parametersTemplate = `
   {{$svc := .Name}}
 
   {{/* Parameter constructors */}}
+
   {{range .Methods -}}
     func new{{.RequestType}}()  { return &{{goType .Request $gopkg}}{}  }
     func new{{.ResponseType}}() { return &{{goType .Response $gopkg}}{} }
   {{end -}}
 
   {{/* Empty parameter types */}}
+
   {{with .Methods}}
     var (
     {{range . -}}
