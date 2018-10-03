@@ -25,7 +25,7 @@ const _clientTemplate = `
             {{goType .Request $gopkg}},
           {{end -}}
           ...yarpc.CallOption,
-        ) ({{clientStream .}}, error)
+        ) ({{clientStreamInterface .}}, error)
       {{end -}}
     {{end -}}
   }
@@ -34,7 +34,7 @@ const _clientTemplate = `
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type {{clientStream .}} interface {
+    type {{clientStreamInterface .}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
       Send({{goType .Request $gopkg}}, ...yarpc.StreamOption) error
