@@ -42,7 +42,7 @@ const _handlerTemplate = `
       }
     {{else -}}
       func (h *{{$handler}}) {{.Name}}(ctx context.Context, m proto.Message) (proto.Message, error) {
-        req, _ := m.(*GetRequest)
+        req, _ := m.(*{{goType .Request $gopkg}})
         if req == nil {
           return nil, protobuf.CastError(_empty{{.RequestType}}, m)
         }

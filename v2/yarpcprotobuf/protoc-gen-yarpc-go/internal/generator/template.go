@@ -10,6 +10,7 @@ var _tmpl = template.Must(
 	parseTemplates(
 		_baseTemplate,
 		_clientTemplate,
+		_callerTemplate,
 		_serverTemplate,
 		_handlerTemplate,
 		_parametersTemplate,
