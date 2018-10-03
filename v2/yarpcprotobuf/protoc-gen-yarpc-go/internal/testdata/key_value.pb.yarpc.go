@@ -118,3 +118,23 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 type _KeyValueHandler struct {
 	server KeyValueServer
 }
+
+func newKeyValueFooRequest()  { return &GetRequest{} }
+func newKeyValueFooResponse() { return &GetResponse{} }
+func newKeyValueBarRequest()  { return &GetRequest{} }
+func newKeyValueBarResponse() { return &GetResponse{} }
+func newKeyValueBazRequest()  { return &GetRequest{} }
+func newKeyValueBazResponse() { return &GetResponse{} }
+func newKeyValueQuxRequest()  { return &GetRequest{} }
+func newKeyValueQuxResponse() { return &GetResponse{} }
+
+var (
+	_emptyKeyValueFooRequest  = &GetRequest{}
+	_emptyKeyValueFooResponse = &GetResponse{}
+	_emptyKeyValueBarRequest  = &GetRequest{}
+	_emptyKeyValueBarResponse = &GetResponse{}
+	_emptyKeyValueBazRequest  = &GetRequest{}
+	_emptyKeyValueBazResponse = &GetResponse{}
+	_emptyKeyValueQuxRequest  = &GetRequest{}
+	_emptyKeyValueQuxResponse = &GetResponse{}
+)

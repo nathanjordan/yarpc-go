@@ -16,15 +16,15 @@ const _serverTemplate = `
       {{if or .ClientStreaming .ServerStreaming -}}
         {{.Name}}(
           {{if not .ClientStreaming -}}
-            {{goType .Request $gopkg}},
+            *{{goType .Request $gopkg}},
           {{end -}}
           {{.ServerStream}},
         ) {{if not .ServerStreaming}} ({{.ServerStream}}, error) {{else}} error {{end}}
       {{else -}}
         {{.Name}}(
           context.Context,
-          {{goType .Request $gopkg}},
-        ) ({{goType .Response $gopkg}}, error)
+          *{{goType .Request $gopkg}},
+        ) (*{{goType .Response $gopkg}}, error)
       {{end -}}
     {{end -}}
   }
@@ -38,10 +38,10 @@ const _serverTemplate = `
     type {{.ServerStream}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
-      Recv(...yarpc.StreamOption) ({{goType .Request $gopkg}}, error)
+      Recv(...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error)
     {{end -}}
     {{if .ServerStreaming -}}
-      Send({{goType .Response $gopkg}}, ...yarpc.StreamOption) error
+      Send(*{{goType .Response $gopkg}}, ...yarpc.StreamOption) error
     {{end -}}
     }
     {{end -}}

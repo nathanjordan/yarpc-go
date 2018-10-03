@@ -11,6 +11,7 @@ var _tmpl = template.Must(
 		_baseTemplate,
 		_clientTemplate,
 		_serverTemplate,
+		_parametersTemplate,
 	),
 )
 
@@ -43,11 +44,10 @@ func execTemplate(data interface{}) ([]byte, error) {
 // It prefixes the type name with the package's alias
 // if it does not belong to the same package.
 func goType(m *Message, pkg string) string {
-	name := m.Name
 	if m.Package.GoPackage != pkg {
-		name = fmt.Sprintf("%s.%s", m.Package.Alias, m.Name)
+		return fmt.Sprintf("%s.%s", m.Package.Alias, m.Name)
 	}
-	return fmt.Sprintf("*%s", name)
+	return m.Name
 }
 
 func unaryMethods(s *Service) []*Method {

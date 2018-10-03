@@ -10,15 +10,17 @@ const _parametersTemplate = `
 
   {{/* Parameter constructors */}}
   {{range .Methods -}}
-    func new{{.RequestType}}()  { return &{{goType .Request $gopkg}}  }
-    func new{{.ResponseType}}() { return &{{goType .Response $gopkg}} }
+    func new{{.RequestType}}()  { return &{{goType .Request $gopkg}}{}  }
+    func new{{.ResponseType}}() { return &{{goType .Response $gopkg}}{} }
   {{end -}}
 
   {{/* Empty parameter types */}}
-  {{range .Methods -}}
+  {{with .Methods}}
     var (
-      _empty{{.RequestType}}  = &{{goType .Request $gopkg}}
-      _empty{{.ResponseType}} = &{{goType .Response $gopkg}}
+    {{range . -}}
+      _empty{{.RequestType}}  = &{{goType .Request $gopkg}}{}
+      _empty{{.ResponseType}} = &{{goType .Response $gopkg}}{}
+    {{end -}}
     )
   {{end -}}
 {{end -}}
