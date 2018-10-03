@@ -97,6 +97,10 @@ type _KeyValueHandler struct {
 	server KeyValueServer
 }
 
+type _KeyValueHandler struct {
+	server KeyValueServer
+}
+
 // BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
 func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 	h := &_KeyValueHandler{server: s}
