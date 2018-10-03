@@ -46,6 +46,19 @@ const _serverTemplate = `
     }
     {{end -}}
   {{end -}}
+
+  func Build<$svc>Procedures(s {{$svc}}Server) []yarpc.Procedure {
+    h := &_{{$svc}}Handler{server: s}
+    return yarpcprotobuf.Procedures(
+      yarpcprotobuf.ProceduresParams{
+        Service: {{printf "%q" $svc}},
+      },
+    )
+  }
+
+  type _{{$svc}}Handler struct {
+    server {{$svc}}Server
+  }
 {{end -}}
 
 {{end -}}{{end -}}
