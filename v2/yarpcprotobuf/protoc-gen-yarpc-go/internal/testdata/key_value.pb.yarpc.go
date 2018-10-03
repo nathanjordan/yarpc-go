@@ -56,6 +56,49 @@ type KeyValueQuxClientStream interface {
 	CloseSend(...yarpc.StreamOption) error
 }
 
+type _KeyValueCaller struct {
+	stream yarpcprotobuf.StreamClient
+}
+
+func (c *_KeyValueCaller) Foo(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (*GetResponse, error) {
+	msg, err := c.stream.Call(ctx, "Foo", req, newKeyValueFooResponse, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res, ok := msg.(*GetResponse)
+	if !ok {
+		return nil, yarpcprotobuf.CastError(_emptyKeyValueFooResponse, res)
+	}
+	return res, nil
+}
+
+func (c *_KeyValueCaller) Bar(ctx context.Context, opts ...yarpc.CallOption) (KeyValueBarClientStream, error) {
+	s, err := c.stream.CallStream(ctx, "Bar", opts...)
+	if err != nil {
+		return err
+	}
+	return &_KeyValueBarClientStream{stream: s}, nil
+}
+
+func (c *_KeyValueCaller) Baz(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (KeyValueBazClientStream, error) {
+	s, err := c.stream.CallStream(ctx, "Baz", opts...)
+	if err != nil {
+		return err
+	}
+	if err := s.Send(req); err != nil {
+		return nil, err
+	}
+	return &_KeyValueBazClientStream{stream: s}, nil
+}
+
+func (c *_KeyValueCaller) Qux(ctx context.Context, opts ...yarpc.CallOption) (KeyValueQuxClientStream, error) {
+	s, err := c.stream.CallStream(ctx, "Qux", opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &_KeyValueQuxClientStream{stream: s}, nil
+}
+
 // KeyValueServer is the KeyValue service's server interface.
 type KeyValueServer interface {
 	Foo(

@@ -49,7 +49,7 @@ const _callerTemplate = `
         if err != nil {
           return nil, err
         }
-        res, ok := msg.(*{{goType .Response "$gopkg"}})
+        res, ok := msg.(*{{goType .Response $gopkg}})
         if !ok {
           return nil, yarpcprotobuf.CastError(_empty{{.ResponseType}}, res)
         }
