@@ -97,8 +97,36 @@ type _KeyValueHandler struct {
 	server KeyValueServer
 }
 
+func (h *_KeyValueHandler) Foo(ctx context.Context, m proto.Message) (proto.Message, error) {
+	req, _ := m.(*GetRequest)
+	if req == nil {
+		return nil, protobuf.CastError(_emptyKeyValueFooRequest, m)
+	}
+	return h.server.Foo(ctx, req)
+}
+
+func (h *_KeyValueHandler) Bar(s *yarpcprotobuf.ServerStream) error {
+	res, err := h.server.Bar(&_KeyValueBarServerStream{server: s})
+	if err != nil {
+		return err
+	}
+	return s.Send(res)
+}
+
+func (h *_KeyValueHandler) Baz(s *yarpcprotobuf.ServerStream) error {
+	recv, err := s.Receive(newKeyValueBazRequest)
+	if err != nil {
+		return err
+	}
+	req, _ := recv.(*KeyValueBazRequest)
+	if req == nil {
+		return yarpcprotobuf.CastError(_emptyKeyValueBazRequest, recv)
+	}
+	return h.server.Baz(req, &_KeyValueBazServerStream{server: s})
+}
+
 func (h *_KeyValueHandler) Qux(s *yarpcprotobuf.ServerStream) error {
-	h.server.Qux(&_KeyValueQuxServerStream{stream: s})
+	return h.server.Qux(&_KeyValueQuxServerStream{stream: s})
 }
 
 // BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
