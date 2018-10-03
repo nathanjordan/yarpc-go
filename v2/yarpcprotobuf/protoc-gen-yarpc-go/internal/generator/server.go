@@ -47,11 +47,6 @@ const _serverTemplate = `
     {{end -}}
   {{end -}}
 
-  {{/* Handler implementation */}}
-
-  type _{{$svc}}Handler struct {
-    server {{$svc}}Server
-  }
 {{end -}}
 
 {{end -}}{{end -}}

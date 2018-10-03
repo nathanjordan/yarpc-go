@@ -17,6 +17,7 @@ package {{.File.Package.GoPackage}}
 
 {{template "client" . -}}
 {{template "server" . -}}
+{{template "handler" . -}}
 {{template "procedures" . -}}
 {{template "parameters" . -}}
 `

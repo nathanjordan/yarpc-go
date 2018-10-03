@@ -11,6 +11,7 @@ var _tmpl = template.Must(
 		_baseTemplate,
 		_clientTemplate,
 		_serverTemplate,
+		_handlerTemplate,
 		_parametersTemplate,
 		_proceduresTemplate,
 	),

@@ -97,8 +97,8 @@ type _KeyValueHandler struct {
 	server KeyValueServer
 }
 
-type _KeyValueHandler struct {
-	server KeyValueServer
+func (h *_KeyValueHandler) Qux(s *yarpcprotobuf.ServerStream) error {
+	h.server.Qux(&_KeyValueQuxServerStream{stream: s})
 }
 
 // BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
