@@ -13,6 +13,7 @@ import (
 	ioutil "io/ioutil"
 )
 
+// KeyValueClient is the KeyValue service's client interface.
 type KeyValueClient interface {
 	Foo(
 		context.Context,
@@ -34,18 +35,21 @@ type KeyValueClient interface {
 	) (KeyValueQuxClientStream, error)
 }
 
+// KeyValueBarClientStream is a streaming interface used in the KeyValue}Client interface.
 type KeyValueBarClientStream interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
 	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
 }
 
+// KeyValueBazClientStream is a streaming interface used in the KeyValue}Client interface.
 type KeyValueBazClientStream interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
+// KeyValueQuxClientStream is a streaming interface used in the KeyValue}Client interface.
 type KeyValueQuxClientStream interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
@@ -53,6 +57,7 @@ type KeyValueQuxClientStream interface {
 	CloseSend(...yarpc.StreamOption) error
 }
 
+// KeyValueServer is the KeyValue service's server interface.
 type KeyValueServer interface {
 	Foo(
 		context.Context,
@@ -70,16 +75,19 @@ type KeyValueServer interface {
 	) error
 }
 
+// KeyValueBarServerStream is a streaming interface used in the KeyValue}Server interface.
 type KeyValueBarServerStream interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
 }
 
+// KeyValueBazServerStream is a streaming interface used in the KeyValue}Server interface.
 type KeyValueBazServerStream interface {
 	Context() context.Context
 	Send(*GetResponse, ...yarpc.StreamOption) error
 }
 
+// KeyValueQuxServerStream is a streaming interface used in the KeyValue}Server interface.
 type KeyValueQuxServerStream interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)

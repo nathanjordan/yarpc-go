@@ -10,6 +10,7 @@ const _clientTemplate = `
 
   {{/* Client interface */}}
 
+  // {{$svc}}Client is the {{$svc}} service's client interface.
   type {{$svc}}Client interface {
     {{range .Methods -}}
       {{if or .ClientStreaming .ServerStreaming -}}
@@ -34,6 +35,7 @@ const _clientTemplate = `
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
+    // {{.ClientStream}} is a streaming interface used in the {{$svc}}}Client interface.
     type {{.ClientStream}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
