@@ -12,7 +12,10 @@ const _serverTemplate = `
   type {{$svc}}Server interface {
     {{range .Methods -}}
       {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
-        {{.Name}}(context.Context, {{.Request.Name}}) ({{.Response.Name}}, error)
+        {{.Name}}(
+          context.Context,
+          {{.Request.Name}},
+        ) ({{.Response.Name}}, error)
       {{else -}}
         {{.Name}}(
           {{if not .ClientStreaming -}}

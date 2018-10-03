@@ -14,12 +14,20 @@ import (
 )
 
 type KeyValueClient interface {
-	Foo(context.Context, GetRequest, ...yarpc.CallOption) (GetResponse, error)
+	Foo(
+		context.Context,
+		GetRequest,
+		...yarpc.CallOption,
+	) (GetResponse, error)
 	Bar(
 		context.Context,
 		...yarpc.CallOption,
 	) (KeyValueBarClientStream, error)
-	Baz(context.Context, GetRequest, ...yarpc.CallOption) (GetResponse, error)
+	Baz(
+		context.Context,
+		GetRequest,
+		...yarpc.CallOption,
+	) (KeyValueBazClientStream, error)
 	Qux(
 		context.Context,
 		...yarpc.CallOption,
@@ -28,28 +36,28 @@ type KeyValueClient interface {
 
 type KeyValueBarClientStream interface {
 	Context() context.Context
-
 	Send(GetRequest, ...yarpc.StreamOption) error
 	CloseAndRecv(...yarpc.StreamOption) (GetResponse, error)
 }
 
 type KeyValueBazClientStream interface {
 	Context() context.Context
-
 	Recv(...yarpc.StreamOption) (GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
 type KeyValueQuxClientStream interface {
 	Context() context.Context
-
 	Send(GetRequest, ...yarpc.StreamOption) error
 	Recv(...yarpc.StreamOption) (GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
 type KeyValueServer interface {
-	Foo(context.Context, GetRequest) (GetResponse, error)
+	Foo(
+		context.Context,
+		GetRequest,
+	) (GetResponse, error)
 	Bar(
 		KeyValueBarServerStream,
 	) (KeyValueBarServerStream, error)
