@@ -20,27 +20,28 @@ var _ = ioutil.NopCloser
 
 // KeyValueYARPCClient is the YARPC client-side interface for the KeyValue service.
 type KeyValueYARPCClient interface {
-	ClientStream(context.Context, ...yarpc.CallOption) (KeyValueServiceClientStreamYARPCClient, error)
-	ServerStream(context.Context, *GetRequest, ...yarpc.CallOption) (KeyValueServiceServerStreamYARPCClient, error)
-	BidirectionalStream(context.Context, ...yarpc.CallOption) (KeyValueServiceBidirectionalStreamYARPCClient, error)
+	Foo(context.Context, *GetRequest, ...yarpc.CallOption) (*GetResponse, error)
+	Bar(context.Context, ...yarpc.CallOption) (KeyValueServiceBarYARPCClient, error)
+	Baz(context.Context, *GetRequest, ...yarpc.CallOption) (KeyValueServiceBazYARPCClient, error)
+	Qux(context.Context, ...yarpc.CallOption) (KeyValueServiceQuxYARPCClient, error)
 }
 
-// KeyValueServiceClientStreamYARPCClient sends GetRequests and receives the single GetResponse when sending is done.
-type KeyValueServiceClientStreamYARPCClient interface {
+// KeyValueServiceBarYARPCClient sends GetRequests and receives the single GetResponse when sending is done.
+type KeyValueServiceBarYARPCClient interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
 	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
 }
 
-// KeyValueServiceServerStreamYARPCClient receives GetResponses, returning io.EOF when the stream is complete.
-type KeyValueServiceServerStreamYARPCClient interface {
+// KeyValueServiceBazYARPCClient receives GetResponses, returning io.EOF when the stream is complete.
+type KeyValueServiceBazYARPCClient interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
-// KeyValueServiceBidirectionalStreamYARPCClient sends GetRequests and receives GetResponses, returning io.EOF when the stream is complete.
-type KeyValueServiceBidirectionalStreamYARPCClient interface {
+// KeyValueServiceQuxYARPCClient sends GetRequests and receives GetResponses, returning io.EOF when the stream is complete.
+type KeyValueServiceQuxYARPCClient interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
 	Recv(...yarpc.StreamOption) (*GetResponse, error)
@@ -60,25 +61,26 @@ func NewKeyValueYARPCClient(clientConfig transport.ClientConfig, options ...prot
 
 // KeyValueYARPCServer is the YARPC server-side interface for the KeyValue service.
 type KeyValueYARPCServer interface {
-	ClientStream(KeyValueServiceClientStreamYARPCServer) (*GetResponse, error)
-	ServerStream(*GetRequest, KeyValueServiceServerStreamYARPCServer) error
-	BidirectionalStream(KeyValueServiceBidirectionalStreamYARPCServer) error
+	Foo(context.Context, *GetRequest) (*GetResponse, error)
+	Bar(KeyValueServiceBarYARPCServer) (*GetResponse, error)
+	Baz(*GetRequest, KeyValueServiceBazYARPCServer) error
+	Qux(KeyValueServiceQuxYARPCServer) error
 }
 
-// KeyValueServiceClientStreamYARPCServer receives GetRequests.
-type KeyValueServiceClientStreamYARPCServer interface {
+// KeyValueServiceBarYARPCServer receives GetRequests.
+type KeyValueServiceBarYARPCServer interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
 }
 
-// KeyValueServiceServerStreamYARPCServer sends GetResponses.
-type KeyValueServiceServerStreamYARPCServer interface {
+// KeyValueServiceBazYARPCServer sends GetResponses.
+type KeyValueServiceBazYARPCServer interface {
 	Context() context.Context
 	Send(*GetResponse, ...yarpc.StreamOption) error
 }
 
-// KeyValueServiceBidirectionalStreamYARPCServer receives GetRequests and sends GetResponse.
-type KeyValueServiceBidirectionalStreamYARPCServer interface {
+// KeyValueServiceQuxYARPCServer receives GetRequests and sends GetResponse.
+type KeyValueServiceQuxYARPCServer interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
 	Send(*GetResponse, ...yarpc.StreamOption) error
@@ -89,33 +91,43 @@ func BuildKeyValueYARPCProcedures(server KeyValueYARPCServer) []transport.Proced
 	handler := &_KeyValueYARPCHandler{server}
 	return protobuf.BuildProcedures(
 		protobuf.BuildProceduresParams{
-			ServiceName:         "keyvalue.KeyValue",
-			UnaryHandlerParams:  []protobuf.BuildProceduresUnaryHandlerParams{},
+			ServiceName: "keyvalue.KeyValue",
+			UnaryHandlerParams: []protobuf.BuildProceduresUnaryHandlerParams{
+				{
+					MethodName: "Foo",
+					Handler: protobuf.NewUnaryHandler(
+						protobuf.UnaryHandlerParams{
+							Handle:     handler.Foo,
+							NewRequest: newKeyValueServiceFooYARPCRequest,
+						},
+					),
+				},
+			},
 			OnewayHandlerParams: []protobuf.BuildProceduresOnewayHandlerParams{},
 			StreamHandlerParams: []protobuf.BuildProceduresStreamHandlerParams{
 				{
-					MethodName: "BidirectionalStream",
+					MethodName: "Qux",
 					Handler: protobuf.NewStreamHandler(
 						protobuf.StreamHandlerParams{
-							Handle: handler.BidirectionalStream,
+							Handle: handler.Qux,
 						},
 					),
 				},
 
 				{
-					MethodName: "ServerStream",
+					MethodName: "Baz",
 					Handler: protobuf.NewStreamHandler(
 						protobuf.StreamHandlerParams{
-							Handle: handler.ServerStream,
+							Handle: handler.Baz,
 						},
 					),
 				},
 
 				{
-					MethodName: "ClientStream",
+					MethodName: "Bar",
 					Handler: protobuf.NewStreamHandler(
 						protobuf.StreamHandlerParams{
-							Handle: handler.ClientStream,
+							Handle: handler.Bar,
 						},
 					),
 				},
@@ -203,228 +215,266 @@ type _KeyValueYARPCCaller struct {
 	streamClient protobuf.StreamClient
 }
 
-func (c *_KeyValueYARPCCaller) ClientStream(ctx context.Context, options ...yarpc.CallOption) (KeyValueServiceClientStreamYARPCClient, error) {
-	stream, err := c.streamClient.CallStream(ctx, "ClientStream", options...)
+func (c *_KeyValueYARPCCaller) Foo(ctx context.Context, request *GetRequest, options ...yarpc.CallOption) (*GetResponse, error) {
+	responseMessage, err := c.streamClient.Call(ctx, "Foo", request, newKeyValueServiceFooYARPCResponse, options...)
+	if responseMessage == nil {
+		return nil, err
+	}
+	response, ok := responseMessage.(*GetResponse)
+	if !ok {
+		return nil, protobuf.CastError(emptyKeyValueServiceFooYARPCResponse, responseMessage)
+	}
+	return response, err
+}
+
+func (c *_KeyValueYARPCCaller) Bar(ctx context.Context, options ...yarpc.CallOption) (KeyValueServiceBarYARPCClient, error) {
+	stream, err := c.streamClient.CallStream(ctx, "Bar", options...)
 	if err != nil {
 		return nil, err
 	}
-	return &_KeyValueServiceClientStreamYARPCClient{stream: stream}, nil
+	return &_KeyValueServiceBarYARPCClient{stream: stream}, nil
 }
 
-func (c *_KeyValueYARPCCaller) ServerStream(ctx context.Context, request *GetRequest, options ...yarpc.CallOption) (KeyValueServiceServerStreamYARPCClient, error) {
-	stream, err := c.streamClient.CallStream(ctx, "ServerStream", options...)
+func (c *_KeyValueYARPCCaller) Baz(ctx context.Context, request *GetRequest, options ...yarpc.CallOption) (KeyValueServiceBazYARPCClient, error) {
+	stream, err := c.streamClient.CallStream(ctx, "Baz", options...)
 	if err != nil {
 		return nil, err
 	}
 	if err := stream.Send(request); err != nil {
 		return nil, err
 	}
-	return &_KeyValueServiceServerStreamYARPCClient{stream: stream}, nil
+	return &_KeyValueServiceBazYARPCClient{stream: stream}, nil
 }
 
-func (c *_KeyValueYARPCCaller) BidirectionalStream(ctx context.Context, options ...yarpc.CallOption) (KeyValueServiceBidirectionalStreamYARPCClient, error) {
-	stream, err := c.streamClient.CallStream(ctx, "BidirectionalStream", options...)
+func (c *_KeyValueYARPCCaller) Qux(ctx context.Context, options ...yarpc.CallOption) (KeyValueServiceQuxYARPCClient, error) {
+	stream, err := c.streamClient.CallStream(ctx, "Qux", options...)
 	if err != nil {
 		return nil, err
 	}
-	return &_KeyValueServiceBidirectionalStreamYARPCClient{stream: stream}, nil
+	return &_KeyValueServiceQuxYARPCClient{stream: stream}, nil
 }
 
 type _KeyValueYARPCHandler struct {
 	server KeyValueYARPCServer
 }
 
-func (h *_KeyValueYARPCHandler) ClientStream(serverStream *protobuf.ServerStream) error {
-	response, err := h.server.ClientStream(&_KeyValueServiceClientStreamYARPCServer{serverStream: serverStream})
+func (h *_KeyValueYARPCHandler) Foo(ctx context.Context, requestMessage proto.Message) (proto.Message, error) {
+	var request *GetRequest
+	var ok bool
+	if requestMessage != nil {
+		request, ok = requestMessage.(*GetRequest)
+		if !ok {
+			return nil, protobuf.CastError(emptyKeyValueServiceFooYARPCRequest, requestMessage)
+		}
+	}
+	response, err := h.server.Foo(ctx, request)
+	if response == nil {
+		return nil, err
+	}
+	return response, err
+}
+
+func (h *_KeyValueYARPCHandler) Bar(serverStream *protobuf.ServerStream) error {
+	response, err := h.server.Bar(&_KeyValueServiceBarYARPCServer{serverStream: serverStream})
 	if err != nil {
 		return err
 	}
 	return serverStream.Send(response)
 }
 
-func (h *_KeyValueYARPCHandler) ServerStream(serverStream *protobuf.ServerStream) error {
-	requestMessage, err := serverStream.Receive(newKeyValueServiceServerStreamYARPCRequest)
+func (h *_KeyValueYARPCHandler) Baz(serverStream *protobuf.ServerStream) error {
+	requestMessage, err := serverStream.Receive(newKeyValueServiceBazYARPCRequest)
 	if requestMessage == nil {
 		return err
 	}
 
 	request, ok := requestMessage.(*GetRequest)
 	if !ok {
-		return protobuf.CastError(emptyKeyValueServiceServerStreamYARPCRequest, requestMessage)
+		return protobuf.CastError(emptyKeyValueServiceBazYARPCRequest, requestMessage)
 	}
-	return h.server.ServerStream(request, &_KeyValueServiceServerStreamYARPCServer{serverStream: serverStream})
+	return h.server.Baz(request, &_KeyValueServiceBazYARPCServer{serverStream: serverStream})
 }
 
-func (h *_KeyValueYARPCHandler) BidirectionalStream(serverStream *protobuf.ServerStream) error {
-	return h.server.BidirectionalStream(&_KeyValueServiceBidirectionalStreamYARPCServer{serverStream: serverStream})
+func (h *_KeyValueYARPCHandler) Qux(serverStream *protobuf.ServerStream) error {
+	return h.server.Qux(&_KeyValueServiceQuxYARPCServer{serverStream: serverStream})
 }
 
-type _KeyValueServiceClientStreamYARPCClient struct {
+type _KeyValueServiceBarYARPCClient struct {
 	stream *protobuf.ClientStream
 }
 
-func (c *_KeyValueServiceClientStreamYARPCClient) Context() context.Context {
+func (c *_KeyValueServiceBarYARPCClient) Context() context.Context {
 	return c.stream.Context()
 }
 
-func (c *_KeyValueServiceClientStreamYARPCClient) Send(request *GetRequest, options ...yarpc.StreamOption) error {
+func (c *_KeyValueServiceBarYARPCClient) Send(request *GetRequest, options ...yarpc.StreamOption) error {
 	return c.stream.Send(request, options...)
 }
 
-func (c *_KeyValueServiceClientStreamYARPCClient) CloseAndRecv(options ...yarpc.StreamOption) (*GetResponse, error) {
+func (c *_KeyValueServiceBarYARPCClient) CloseAndRecv(options ...yarpc.StreamOption) (*GetResponse, error) {
 	if err := c.stream.Close(options...); err != nil {
 		return nil, err
 	}
-	responseMessage, err := c.stream.Receive(newKeyValueServiceClientStreamYARPCResponse, options...)
+	responseMessage, err := c.stream.Receive(newKeyValueServiceBarYARPCResponse, options...)
 	if responseMessage == nil {
 		return nil, err
 	}
 	response, ok := responseMessage.(*GetResponse)
 	if !ok {
-		return nil, protobuf.CastError(emptyKeyValueServiceClientStreamYARPCResponse, responseMessage)
+		return nil, protobuf.CastError(emptyKeyValueServiceBarYARPCResponse, responseMessage)
 	}
 	return response, err
 }
 
-type _KeyValueServiceServerStreamYARPCClient struct {
+type _KeyValueServiceBazYARPCClient struct {
 	stream *protobuf.ClientStream
 }
 
-func (c *_KeyValueServiceServerStreamYARPCClient) Context() context.Context {
+func (c *_KeyValueServiceBazYARPCClient) Context() context.Context {
 	return c.stream.Context()
 }
 
-func (c *_KeyValueServiceServerStreamYARPCClient) Recv(options ...yarpc.StreamOption) (*GetResponse, error) {
-	responseMessage, err := c.stream.Receive(newKeyValueServiceServerStreamYARPCResponse, options...)
+func (c *_KeyValueServiceBazYARPCClient) Recv(options ...yarpc.StreamOption) (*GetResponse, error) {
+	responseMessage, err := c.stream.Receive(newKeyValueServiceBazYARPCResponse, options...)
 	if responseMessage == nil {
 		return nil, err
 	}
 	response, ok := responseMessage.(*GetResponse)
 	if !ok {
-		return nil, protobuf.CastError(emptyKeyValueServiceServerStreamYARPCResponse, responseMessage)
+		return nil, protobuf.CastError(emptyKeyValueServiceBazYARPCResponse, responseMessage)
 	}
 	return response, err
 }
 
-func (c *_KeyValueServiceServerStreamYARPCClient) CloseSend(options ...yarpc.StreamOption) error {
+func (c *_KeyValueServiceBazYARPCClient) CloseSend(options ...yarpc.StreamOption) error {
 	return c.stream.Close(options...)
 }
 
-type _KeyValueServiceBidirectionalStreamYARPCClient struct {
+type _KeyValueServiceQuxYARPCClient struct {
 	stream *protobuf.ClientStream
 }
 
-func (c *_KeyValueServiceBidirectionalStreamYARPCClient) Context() context.Context {
+func (c *_KeyValueServiceQuxYARPCClient) Context() context.Context {
 	return c.stream.Context()
 }
 
-func (c *_KeyValueServiceBidirectionalStreamYARPCClient) Send(request *GetRequest, options ...yarpc.StreamOption) error {
+func (c *_KeyValueServiceQuxYARPCClient) Send(request *GetRequest, options ...yarpc.StreamOption) error {
 	return c.stream.Send(request, options...)
 }
 
-func (c *_KeyValueServiceBidirectionalStreamYARPCClient) Recv(options ...yarpc.StreamOption) (*GetResponse, error) {
-	responseMessage, err := c.stream.Receive(newKeyValueServiceBidirectionalStreamYARPCResponse, options...)
+func (c *_KeyValueServiceQuxYARPCClient) Recv(options ...yarpc.StreamOption) (*GetResponse, error) {
+	responseMessage, err := c.stream.Receive(newKeyValueServiceQuxYARPCResponse, options...)
 	if responseMessage == nil {
 		return nil, err
 	}
 	response, ok := responseMessage.(*GetResponse)
 	if !ok {
-		return nil, protobuf.CastError(emptyKeyValueServiceBidirectionalStreamYARPCResponse, responseMessage)
+		return nil, protobuf.CastError(emptyKeyValueServiceQuxYARPCResponse, responseMessage)
 	}
 	return response, err
 }
 
-func (c *_KeyValueServiceBidirectionalStreamYARPCClient) CloseSend(options ...yarpc.StreamOption) error {
+func (c *_KeyValueServiceQuxYARPCClient) CloseSend(options ...yarpc.StreamOption) error {
 	return c.stream.Close(options...)
 }
 
-type _KeyValueServiceClientStreamYARPCServer struct {
+type _KeyValueServiceBarYARPCServer struct {
 	serverStream *protobuf.ServerStream
 }
 
-func (s *_KeyValueServiceClientStreamYARPCServer) Context() context.Context {
+func (s *_KeyValueServiceBarYARPCServer) Context() context.Context {
 	return s.serverStream.Context()
 }
 
-func (s *_KeyValueServiceClientStreamYARPCServer) Recv(options ...yarpc.StreamOption) (*GetRequest, error) {
-	requestMessage, err := s.serverStream.Receive(newKeyValueServiceClientStreamYARPCRequest, options...)
+func (s *_KeyValueServiceBarYARPCServer) Recv(options ...yarpc.StreamOption) (*GetRequest, error) {
+	requestMessage, err := s.serverStream.Receive(newKeyValueServiceBarYARPCRequest, options...)
 	if requestMessage == nil {
 		return nil, err
 	}
 	request, ok := requestMessage.(*GetRequest)
 	if !ok {
-		return nil, protobuf.CastError(emptyKeyValueServiceClientStreamYARPCRequest, requestMessage)
+		return nil, protobuf.CastError(emptyKeyValueServiceBarYARPCRequest, requestMessage)
 	}
 	return request, err
 }
 
-type _KeyValueServiceServerStreamYARPCServer struct {
+type _KeyValueServiceBazYARPCServer struct {
 	serverStream *protobuf.ServerStream
 }
 
-func (s *_KeyValueServiceServerStreamYARPCServer) Context() context.Context {
+func (s *_KeyValueServiceBazYARPCServer) Context() context.Context {
 	return s.serverStream.Context()
 }
 
-func (s *_KeyValueServiceServerStreamYARPCServer) Send(response *GetResponse, options ...yarpc.StreamOption) error {
+func (s *_KeyValueServiceBazYARPCServer) Send(response *GetResponse, options ...yarpc.StreamOption) error {
 	return s.serverStream.Send(response, options...)
 }
 
-type _KeyValueServiceBidirectionalStreamYARPCServer struct {
+type _KeyValueServiceQuxYARPCServer struct {
 	serverStream *protobuf.ServerStream
 }
 
-func (s *_KeyValueServiceBidirectionalStreamYARPCServer) Context() context.Context {
+func (s *_KeyValueServiceQuxYARPCServer) Context() context.Context {
 	return s.serverStream.Context()
 }
 
-func (s *_KeyValueServiceBidirectionalStreamYARPCServer) Recv(options ...yarpc.StreamOption) (*GetRequest, error) {
-	requestMessage, err := s.serverStream.Receive(newKeyValueServiceBidirectionalStreamYARPCRequest, options...)
+func (s *_KeyValueServiceQuxYARPCServer) Recv(options ...yarpc.StreamOption) (*GetRequest, error) {
+	requestMessage, err := s.serverStream.Receive(newKeyValueServiceQuxYARPCRequest, options...)
 	if requestMessage == nil {
 		return nil, err
 	}
 	request, ok := requestMessage.(*GetRequest)
 	if !ok {
-		return nil, protobuf.CastError(emptyKeyValueServiceBidirectionalStreamYARPCRequest, requestMessage)
+		return nil, protobuf.CastError(emptyKeyValueServiceQuxYARPCRequest, requestMessage)
 	}
 	return request, err
 }
 
-func (s *_KeyValueServiceBidirectionalStreamYARPCServer) Send(response *GetResponse, options ...yarpc.StreamOption) error {
+func (s *_KeyValueServiceQuxYARPCServer) Send(response *GetResponse, options ...yarpc.StreamOption) error {
 	return s.serverStream.Send(response, options...)
 }
 
-func newKeyValueServiceClientStreamYARPCRequest() proto.Message {
+func newKeyValueServiceFooYARPCRequest() proto.Message {
 	return &GetRequest{}
 }
 
-func newKeyValueServiceClientStreamYARPCResponse() proto.Message {
+func newKeyValueServiceFooYARPCResponse() proto.Message {
 	return &GetResponse{}
 }
 
-func newKeyValueServiceServerStreamYARPCRequest() proto.Message {
+func newKeyValueServiceBarYARPCRequest() proto.Message {
 	return &GetRequest{}
 }
 
-func newKeyValueServiceServerStreamYARPCResponse() proto.Message {
+func newKeyValueServiceBarYARPCResponse() proto.Message {
 	return &GetResponse{}
 }
 
-func newKeyValueServiceBidirectionalStreamYARPCRequest() proto.Message {
+func newKeyValueServiceBazYARPCRequest() proto.Message {
 	return &GetRequest{}
 }
 
-func newKeyValueServiceBidirectionalStreamYARPCResponse() proto.Message {
+func newKeyValueServiceBazYARPCResponse() proto.Message {
+	return &GetResponse{}
+}
+
+func newKeyValueServiceQuxYARPCRequest() proto.Message {
+	return &GetRequest{}
+}
+
+func newKeyValueServiceQuxYARPCResponse() proto.Message {
 	return &GetResponse{}
 }
 
 var (
-	emptyKeyValueServiceClientStreamYARPCRequest         = &GetRequest{}
-	emptyKeyValueServiceClientStreamYARPCResponse        = &GetResponse{}
-	emptyKeyValueServiceServerStreamYARPCRequest         = &GetRequest{}
-	emptyKeyValueServiceServerStreamYARPCResponse        = &GetResponse{}
-	emptyKeyValueServiceBidirectionalStreamYARPCRequest  = &GetRequest{}
-	emptyKeyValueServiceBidirectionalStreamYARPCResponse = &GetResponse{}
+	emptyKeyValueServiceFooYARPCRequest  = &GetRequest{}
+	emptyKeyValueServiceFooYARPCResponse = &GetResponse{}
+	emptyKeyValueServiceBarYARPCRequest  = &GetRequest{}
+	emptyKeyValueServiceBarYARPCResponse = &GetResponse{}
+	emptyKeyValueServiceBazYARPCRequest  = &GetRequest{}
+	emptyKeyValueServiceBazYARPCResponse = &GetResponse{}
+	emptyKeyValueServiceQuxYARPCRequest  = &GetRequest{}
+	emptyKeyValueServiceQuxYARPCResponse = &GetResponse{}
 )
 
 func init() {
