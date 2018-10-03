@@ -41,8 +41,7 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 // with the registry. Note that all CodeGeneratorRequests SHOULD only request
 // to generate a single go package. Otherwise, multiple go packages will
 // be deposited in the same directory and will therefore not compile. This
-// is synonymous to the protoc-gen-go plugin, so we implement the same
-// restriction here.
+// is synonymous to the protoc-gen-go plugin restriction.
 func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 	for _, f := range req.GetProtoFile() {
 		r.loadFile(f)
@@ -160,16 +159,16 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 		Response:        response,
 		ClientStreaming: m.GetClientStreaming(),
 		ServerStreaming: m.GetServerStreaming(),
+		ClientStream:    streamingInterface(svc, m.GetName(), _clientStream),
+		ServerStream:    streamingInterface(svc, m.GetName(), _serverStream),
 	}, nil
 }
 
 func (r *registry) newPackage(f *descriptor.FileDescriptorProto) *Package {
-	importPath := importPath(f)
 	return &Package{
-		Name:       f.GetPackage(),
-		GoPackage:  goPackage(f),
-		ImportPath: importPath,
-		Alias:      r.imports.Add(importPath),
+		Name:      f.GetPackage(),
+		GoPackage: goPackage(f),
+		Alias:     r.imports.Add(importPath(f)),
 	}
 }
 
@@ -210,4 +209,17 @@ func importPath(f *descriptor.FileDescriptorProto) string {
 		return gopkg[:idx]
 	}
 	return filepath.Dir(f.GetName())
+}
+
+// streamingInterface constructs a streaming interface name
+// from the given method and service name, appending the
+// stream type as a suffix.
+//
+//  Ex:
+//  service Foo {
+//    Bar(stream BarRequest) returns (BarResponse)
+//
+//  -> FooBarClientStream
+func streamingInterface(service, method, stream string) string {
+	return strings.Join([]string{service, method, stream}, "")
 }

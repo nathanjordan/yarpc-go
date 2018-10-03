@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	_clientStreamInterface = "ClientStream"
-	_serverStreamInterface = "ServerStream"
+	_clientStream = "ClientStream"
+	_serverStream = "ServerStream"
 )
 
 var _tmpl = template.Must(
@@ -22,9 +22,7 @@ var _tmpl = template.Must(
 func parseTemplates(templates ...string) (*template.Template, error) {
 	t := template.New(_plugin).Funcs(
 		template.FuncMap{
-			"goType":       goType,
-			"clientStreamInterface": clientStreamInterface,
-			"serverStreamInterface": serverStreamInterface,
+			"goType": goType,
 		},
 	)
 	for _, tmpl := range templates {
@@ -42,18 +40,6 @@ func execTemplate(data interface{}) ([]byte, error) {
 		return nil, err
 	}
 	return buffer.Bytes(), nil
-}
-
-// clientStreamInterface returns the name of the client stream
-// interface for the given method.
-func clientStreamInterface(m *Method) string {
-	return fmt.Sprintf("%s%s%s", m.Service, m.Name, _clientStreamInterface)
-}
-
-// serverStreamInterface returns the name of the server stream
-// interface for the given method.
-func serverStreamInterface(m *Method) string {
-	return fmt.Sprintf("%s%s%s", m.Service, m.Name, _serverStreamInterface)
 }
 
 // goType returns a go type name for the message type.

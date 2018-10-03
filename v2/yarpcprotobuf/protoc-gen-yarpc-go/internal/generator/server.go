@@ -22,8 +22,8 @@ const _serverTemplate = `
           {{if not .ClientStreaming -}}
             {{goType .Request $gopkg}},
           {{end -}}
-          {{serverStreamInterface .}},
-        ) {{if not .ServerStreaming}} ({{serverStreamInterface .}}, error) {{else}} error {{end}}
+          {{.ServerStream}},
+        ) {{if not .ServerStreaming}} ({{.ServerStream}}, error) {{else}} error {{end}}
       {{end -}}
     {{end -}}
   }
@@ -33,7 +33,7 @@ const _serverTemplate = `
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type {{serverStreamInterface .}} interface {
+    type {{.ServerStream}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
       Recv(...yarpc.StreamOption) ({{goType .Request $gopkg}}, error)

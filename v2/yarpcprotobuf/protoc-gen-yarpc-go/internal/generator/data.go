@@ -25,10 +25,9 @@ type File struct {
 // Package holds information with respect
 // to a Proto type's package.
 type Package struct {
-	Name       string
-	GoPackage  string
-	ImportPath string
-	Alias      string
+	Name      string
+	GoPackage string
+	Alias     string
 }
 
 // Service represents a Protobuf service definition.
@@ -46,6 +45,8 @@ type Method struct {
 	Response        *Message
 	ClientStreaming bool
 	ServerStreaming bool
+	ClientStream    string
+	ServerStream    string
 }
 
 // Message represents a Protobuf message definition.
