@@ -2,7 +2,6 @@ package generator
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -14,8 +13,6 @@ type Imports map[string]string
 func newImports(paths ...string) Imports {
 	imports := Imports{}
 	for _, path := range paths {
-		os.Stderr.WriteString("Adding path")
-		os.Stderr.WriteString(path)
 		imports.Add(path)
 	}
 	return imports
@@ -32,7 +29,7 @@ func newImports(paths ...string) Imports {
 //   imports.Add("encoding/json") -> "encodingjson"
 //   imports.Add("encodingjson")  -> "_encodingjson"
 func (imp Imports) Add(path string) string {
-	if path == "" {
+	if path == "" || path == "." {
 		return ""
 	}
 	if alias, ok := imp[path]; ok {

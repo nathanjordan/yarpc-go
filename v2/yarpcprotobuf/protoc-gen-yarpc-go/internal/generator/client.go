@@ -14,7 +14,7 @@ const _clientTemplate = `
       {{if and (not .ClientStreaming) (not .ServerStreaming) -}}
         {{.Name}}(context.Context, {{.Request.Name}}, ...yarpc.CallOption) ({{.Response.Name}}, error)
       {{else -}}
-        {{.Name}}(context.Context, {{if not .ClientStreaming}}{{.Request.Name}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Response.Name}}Client, error)
+        {{.Name}}(context.Context, {{if not .ClientStreaming}}{{.Request.Name}},{{end -}} ...yarpc.CallOption) ({{$svc}}{{.Name}}ClientStream, error)
       {{end -}}
     {{end -}}
   }
@@ -23,7 +23,7 @@ const _clientTemplate = `
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type {{.Name}}Client interface {
+    type {{$svc}}{{.Name}}ClientStream interface {
       Context() context.Context
 
     {{if .ClientStreaming -}}

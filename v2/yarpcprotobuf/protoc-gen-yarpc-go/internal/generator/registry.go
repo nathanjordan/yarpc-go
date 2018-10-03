@@ -107,9 +107,10 @@ func (r *registry) loadFile(f *descriptor.FileDescriptorProto) {
 	pkg := r.newPackage(f)
 	file := &File{
 		FileDescriptorProto: f,
+		Name:                f.GetName(),
 		Package:             pkg,
 	}
-	r.files[file.GetName()] = file
+	r.files[file.Name] = file
 	for _, m := range f.GetMessageType() {
 		r.loadMessage(file, m)
 	}
