@@ -27,7 +27,6 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 		messages: make(map[string]*Message),
 		imports: newImports(
 			"context",
-			"io/ioutil",
 			"github.com/gogo/protobuf/proto",
 			"go.uber.org/fx",
 			"go.uber.org/yarpc/v2/yarpc",
