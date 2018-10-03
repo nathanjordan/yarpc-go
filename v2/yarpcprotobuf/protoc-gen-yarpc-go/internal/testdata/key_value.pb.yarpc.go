@@ -93,6 +93,10 @@ type KeyValueQuxServerStream interface {
 	Send(*GetResponse, ...yarpc.StreamOption) error
 }
 
+type _KeyValueHandler struct {
+	server KeyValueServer
+}
+
 // BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
 func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 	h := &_KeyValueHandler{server: s}
@@ -100,7 +104,6 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 		yarpcprotobuf.ProceduresParams{
 			Service: "KeyValue",
 			Unary: []yarpcprotobuf.UnaryProceduresParams{
-
 				{
 					MethodName: "Foo",
 					Handler: yarpcprotobuf.NewUnaryHandler{
@@ -112,7 +115,6 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 				},
 			},
 			Stream: []yarpcprotobuf.StreamProceduresParams{
-
 				{
 					MethodName: "Bar",
 					Handler: yarpcprotobuf.NewStreamHandler{
@@ -121,7 +123,6 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 						},
 					},
 				},
-
 				{
 					MethodName: "Baz",
 					Handler: yarpcprotobuf.NewStreamHandler{
@@ -130,7 +131,6 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 						},
 					},
 				},
-
 				{
 					MethodName: "Qux",
 					Handler: yarpcprotobuf.NewStreamHandler{
@@ -142,10 +142,6 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 			},
 		},
 	)
-}
-
-type _KeyValueHandler struct {
-	server KeyValueServer
 }
 
 func newKeyValueFooRequest()  { return &GetRequest{} }
