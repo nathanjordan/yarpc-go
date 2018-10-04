@@ -147,7 +147,7 @@ func (r *registry) loadService(f *File, s *descriptor.ServiceDescriptorProto) er
 		Server:  join(name, _server),
 	}
 	for _, m := range s.GetMethod() {
-		method, err := r.newMethod(m, s.GetName())
+		method, err := r.newMethod(m, name)
 		if err != nil {
 			return err
 		}
@@ -169,7 +169,6 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 	name := m.GetName()
 	return &Method{
 		Name:            name,
-		Service:         svc,
 		Request:         request,
 		Response:        response,
 		ClientStreaming: m.GetClientStreaming(),

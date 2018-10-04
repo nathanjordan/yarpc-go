@@ -4,81 +4,80 @@
 
 {{range .Services -}}
 
-{{/* Fx clients */}}
+  {{/* Fx clients */}}
 
-{{$fxClient := printf "Fx%s" .Client}}
+  {{$fxClient := printf "Fx%s" .Client}}
 
-// {{$fxClient}}Params defines the parameters
-// required to provide a {{.Client}} into an
-// Fx application.
-type {{$fxClient}}Params struct {
-  fx.In
+  // {{$fxClient}}Params defines the parameters
+  // required to provide a {{.Client}} into an
+  // Fx application.
+  type {{$fxClient}}Params struct {
+    fx.In
 
-  Client yarpc.Client
-}
+    Client yarpc.Client
+  }
 
-// {{$fxClient}}Result provides a {{.Client}}
-// into an Fx application.
-type {{$fxClient}}Result struct {
-  fx.Out
+  // {{$fxClient}}Result provides a {{.Client}}
+  // into an Fx application.
+  type {{$fxClient}}Result struct {
+    fx.Out
 
-  Client {{.Client}}
-}
+    Client {{.Client}}
+  }
 
-// New{{$fxClient}} provides a {{.Client}}
-// into an Fx application, using the given
-// name for routing.
-//
-//  fx.Provide(
-//    {{$gopkg}}.New{{$fxClient}}("service-name"),
-//    ...
-//  )
-// TODO(mensch): How will this work in v2?
-func New{{$fxClient}}(_ string, opts ...yarpcprotobuf.ClientOption) interface{} {
-  return func(p {{$fxClient}}Params) {{$fxClient}}Result {
-    return {{$fxClient}}Result{
-      Client: New{{$fxClient}}(p.Client, opts...),
+  // New{{$fxClient}} provides a {{.Client}}
+  // into an Fx application, using the given
+  // name for routing.
+  //
+  //  fx.Provide(
+  //    {{$gopkg}}.New{{$fxClient}}("service-name"),
+  //    ...
+  //  )
+  // TODO(mensch): How will this work in v2?
+  func New{{$fxClient}}(_ string, opts ...yarpcprotobuf.ClientOption) interface{} {
+    return func(p {{$fxClient}}Params) {{$fxClient}}Result {
+      return {{$fxClient}}Result{
+        Client: New{{$fxClient}}(p.Client, opts...),
+      }
     }
   }
-}
 
-{{/* Fx procedures */}}
+  {{/* Fx procedures */}}
 
-{{$fxProcedures := printf "Fx%s%s" .Name "Procedures"}}
+  {{$fxProcedures := printf "Fx%s%s" .Name "Procedures"}}
 
-// {{$fxProcedures}}Params defines the paramaters
-// required to provide the {{.Server}} procedures
-// into an Fx application.
-type {{$fxProcedures}}Params struct {
-  fx.In
+  // {{$fxProcedures}}Params defines the paramaters
+  // required to provide the {{.Server}} procedures
+  // into an Fx application.
+  type {{$fxProcedures}}Params struct {
+    fx.In
 
-  Server {{.Server}}
-}
+    Server {{.Server}}
+  }
 
-// {{$fxProcedures}}Result provides the {{.Server}}
-// procedures into an Fx application.
-type {{$fxProcedures}}Result struct {
-  fx.Out
+  // {{$fxProcedures}}Result provides the {{.Server}}
+  // procedures into an Fx application.
+  type {{$fxProcedures}}Result struct {
+    fx.Out
 
-  Procedures []yarpc.Procedure `group:"yarpcfx"`
-}
+    Procedures []yarpc.Procedure `group:"yarpcfx"`
+  }
 
-// New{{$fxProcedures}} provides the {{.Server}}
-// procedures to an Fx application. It expects
-// a {{.Server}} to be present in the container.
-//
-//  fx.Provide(
-//    {{$gopkg}}.New{{$fxProcedures}}(),
-//    ...
-//  )
-func New{{$fxProcedures}}() interface{} {
-  return func(p {{$fxProcedures}}Params) {{$fxProcedures}}Result {
-    return {{$fxProcedures}}Result{
-      Procedures: Build{{.Name}}Procedures(p.Server),
+  // New{{$fxProcedures}} provides the {{.Server}}
+  // procedures to an Fx application. It expects
+  // a {{.Server}} to be present in the container.
+  //
+  //  fx.Provide(
+  //    {{$gopkg}}.New{{$fxProcedures}}(),
+  //    ...
+  //  )
+  func New{{$fxProcedures}}() interface{} {
+    return func(p {{$fxProcedures}}Params) {{$fxProcedures}}Result {
+      return {{$fxProcedures}}Result{
+        Procedures: Build{{.Name}}Procedures(p.Server),
+      }
     }
   }
-}
-
 {{end -}}
 
 {{end -}}{{end -}}
