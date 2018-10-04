@@ -33,12 +33,17 @@ type registry struct {
 	files    map[string]*File
 	messages map[string]*Message
 	imports  Imports
+
+	/* Plugin parameters */
+	importPath string
+	packages   map[string]string
 }
 
 func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 	r := &registry{
 		files:    make(map[string]*File),
 		messages: make(map[string]*Message),
+		packages: make(map[string]string),
 		imports: Imports{
 			"context":                            "context",
 			"go.uber.org/fx":                     "fx",
@@ -46,6 +51,24 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 			"go.uber.org/yarpc/v2":               "yarpc",
 			"go.uber.org/yarpc/v2/yarpcprotobuf": "yarpcprotobuf",
 		},
+	}
+	// Process command-line plugin parameters.
+	if req.Parameter != nil {
+		for _, p := range strings.Split(req.GetParameter(), ",") {
+			param := strings.SplitN(p, "=", 2)
+			if len(param) != 2 {
+				return nil, fmt.Errorf("plugin flags should include a single '='")
+			}
+			flag, value := param[0], param[1]
+			switch {
+			case flag == "import_path":
+				r.importPath = value
+			case strings.HasPrefix(flag, "M"):
+				r.packages[flag[1:]] = value
+			default:
+				return nil, fmt.Errorf("unknown flag: %v", flag)
+			}
+		}
 	}
 	return r, r.Load(req)
 }
@@ -194,7 +217,7 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 
 func (r *registry) newPackage(f *descriptor.FileDescriptorProto) *Package {
 	return &Package{
-		alias:     r.imports.Add(importPath(f)),
+		alias:     r.imports.Add(r.getImportPath(f)),
 		name:      f.GetPackage(),
 		GoPackage: goPackage(f),
 	}
@@ -231,12 +254,17 @@ func goPackage(f *descriptor.FileDescriptorProto) string {
 //
 //   option go_package = "gen/proto:bazpb";
 //   -> "gen/proto"
-func importPath(f *descriptor.FileDescriptorProto) string {
+func (r *registry) getImportPath(f *descriptor.FileDescriptorProto) string {
+	if path, ok := r.packages[f.GetName()]; ok {
+		return path
+	}
+
 	gopkg := f.Options.GetGoPackage()
 	if idx := strings.LastIndex(gopkg, "/"); idx >= 0 {
 		return gopkg[:idx]
 	}
-	return filepath.Dir(f.GetName())
+
+	return filepath.Join(r.importPath, filepath.Dir(f.GetName()))
 }
 
 func join(s ...string) string {
