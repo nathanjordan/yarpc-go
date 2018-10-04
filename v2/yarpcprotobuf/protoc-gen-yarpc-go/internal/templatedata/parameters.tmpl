@@ -7,8 +7,8 @@
   {{/* Parameter constructors */}}
 
   {{range .Methods -}}
-    func {{.NewRequest}}()  { return &{{goType .Request $gopkg}}{}  }
-    func {{.NewResponse}}() { return &{{goType .Response $gopkg}}{} }
+    func {{.NewRequest}}() proto.Message { return &{{goType .Request $gopkg}}{}  }
+    func {{.NewResponse}}() proto.Message { return &{{goType .Response $gopkg}}{} }
   {{end -}}
 
   {{/* Empty parameter types */}}

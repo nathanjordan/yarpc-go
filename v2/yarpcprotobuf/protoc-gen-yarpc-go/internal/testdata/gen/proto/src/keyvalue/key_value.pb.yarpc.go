@@ -82,22 +82,22 @@ func BuildStoreProcedures(s StoreServer) []yarpc.Procedure {
 			Service: "keyvalue.Store",
 			Unary: []yarpcprotobuf.UnaryProceduresParams{
 				{
-					MethodName: "Get",
-					Handler: yarpcprotobuf.NewUnaryHandler{
+					Method: "Get",
+					Handler: yarpcprotobuf.NewUnaryHandler(
 						yarpcprotobuf.UnaryHandlerParams{
 							Handle: h.Get,
 							Create: newStoreGetRequest(),
 						},
-					},
+					),
 				},
 				{
-					MethodName: "Set",
-					Handler: yarpcprotobuf.NewUnaryHandler{
+					Method: "Set",
+					Handler: yarpcprotobuf.NewUnaryHandler(
 						yarpcprotobuf.UnaryHandlerParams{
 							Handle: h.Set,
 							Create: newStoreSetRequest(),
 						},
-					},
+					),
 				},
 			},
 			Stream: []yarpcprotobuf.StreamProceduresParams{},
@@ -111,19 +111,11 @@ type _StoreServer struct {
 
 var _ StoreServer = (*_StoreServer)(nil)
 
-func (h *_StoreServer) Get(ctx context.Context, m proto.Message) (proto.Message, error) {
-	req, _ := m.(*common.GetRequest)
-	if req == nil {
-		return nil, yarpcprotobuf.CastError(_emptyStoreGetRequest, m)
-	}
+func (h *_StoreServer) Get(ctx context.Context, req *common.GetRequest) (proto.Message, error) {
 	return h.server.Get(ctx, req)
 }
 
-func (h *_StoreServer) Set(ctx context.Context, m proto.Message) (proto.Message, error) {
-	req, _ := m.(*common.SetRequest)
-	if req == nil {
-		return nil, yarpcprotobuf.CastError(_emptyStoreSetRequest, m)
-	}
+func (h *_StoreServer) Set(ctx context.Context, req *common.SetRequest) (proto.Message, error) {
 	return h.server.Set(ctx, req)
 }
 
@@ -194,10 +186,10 @@ func NewFxStoreServer() interface{} {
 	}
 }
 
-func newStoreGetRequest()  { return &common.GetRequest{} }
-func newStoreGetResponse() { return &common.GetResponse{} }
-func newStoreSetRequest()  { return &common.SetRequest{} }
-func newStoreSetResponse() { return &common.SetResponse{} }
+func newStoreGetRequest() proto.Message  { return &common.GetRequest{} }
+func newStoreGetResponse() proto.Message { return &common.GetResponse{} }
+func newStoreSetRequest() proto.Message  { return &common.SetRequest{} }
+func newStoreSetResponse() proto.Message { return &common.SetResponse{} }
 
 var (
 	_emptyStoreGetRequest  = &common.GetRequest{}
