@@ -1,4 +1,4 @@
-{{define "clientStream" -}}
+{{define "client_stream" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
 
@@ -9,8 +9,8 @@
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    // {{.ClientStream}} is a streaming interface used in the {{$client}} interface.
-    type {{.ClientStream}} interface {
+    // {{.StreamClient}} is a streaming interface used in the {{$client}} interface.
+    type {{.StreamClient}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
       Send(*{{goType .Request $gopkg}}, ...yarpc.StreamOption) error
@@ -30,22 +30,22 @@
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type _{{.ClientStream}} struct {
-      stream *yarpcprotobuf.ClientStream
+    type _{{.StreamClient}} struct {
+      stream *yarpcprotobuf.StreamClient
     }
 
-    func (c *_{{.ClientStream}}) Context() context.Context {
+    func (c *_{{.StreamClient}}) Context() context.Context {
       return c.stream.Context()
     }
 
     {{if .ClientStreaming}}
-    func (c *_{{.ClientStream}}) Send(req *{{goType .Request $gopkg}}, opts ...yarpc.StreamOption) error {
+    func (c *_{{.StreamClient}}) Send(req *{{goType .Request $gopkg}}, opts ...yarpc.StreamOption) error {
       return c.stream.Send(req, opts...)
     }
     {{end -}}
 
     {{if .ServerStreaming}}
-    func (c *_{{.ClientStream}}) Recv(opts ...yarpc.StreamOption) (*{{goType .Response $gopkg}}, error) {
+    func (c *_{{.StreamClient}}) Recv(opts ...yarpc.StreamOption) (*{{goType .Response $gopkg}}, error) {
       msg, err := c.stream.Receive(new{{.ResponseType}}, opts...)
       if err != nil {
         return nil, err
@@ -57,13 +57,13 @@
       return res, nil
     }
 
-    func (c *_{{.ClientStream}}) CloseSend(opts ...yarpc.StreamOption) error {
+    func (c *_{{.StreamClient}}) CloseSend(opts ...yarpc.StreamOption) error {
       return c.stream.Close(opts...)
     }
     {{end -}}
 
     {{if and .ClientStreaming (not .ServerStreaming)}}
-    func (c *_{{.ClientStream}}) CloseAndRecv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
+    func (c *_{{.StreamClient}}) CloseAndRecv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
       if err := c.stream.Close(opts...); err != nil {
         return nil, err
       }

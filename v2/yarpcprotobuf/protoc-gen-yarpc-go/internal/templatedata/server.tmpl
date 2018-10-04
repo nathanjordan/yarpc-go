@@ -15,8 +15,8 @@
           {{if not .ClientStreaming -}}
             *{{goType .Request $gopkg}},
           {{end -}}
-          {{.ServerStream}},
-        ) {{if not .ServerStreaming}} ({{.ServerStream}}, error) {{else}} error {{end}}
+          {{.StreamServer}},
+        ) {{if not .ServerStreaming}} ({{.StreamServer}}, error) {{else}} error {{end}}
       {{else -}}
         {{.Name}}(
           context.Context,

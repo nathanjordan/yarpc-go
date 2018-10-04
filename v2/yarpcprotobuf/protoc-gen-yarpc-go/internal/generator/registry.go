@@ -16,8 +16,8 @@ const (
 	_server       = "Server"
 	_request      = "Request"
 	_response     = "Response"
-	_clientStream = "ClientStream"
-	_serverStream = "ServerStream"
+	_clientStream = "StreamClient"
+	_serverStream = "StreamServer"
 )
 
 // registry is used to collect and register all
@@ -176,8 +176,8 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 		Response:        response,
 		ClientStreaming: m.GetClientStreaming(),
 		ServerStreaming: m.GetServerStreaming(),
-		ClientStream:    streamInterface(svc, name, _clientStream),
-		ServerStream:    streamInterface(svc, name, _serverStream),
+		StreamClient:    streamInterface(svc, name, _clientStream),
+		StreamServer:    streamInterface(svc, name, _serverStream),
 		RequestType:     parameterType(svc, name, _request),
 		ResponseType:    parameterType(svc, name, _response),
 	}, nil
@@ -238,7 +238,7 @@ func importPath(f *descriptor.FileDescriptorProto) string {
 //  service Foo {
 //    Bar(stream BarRequest) returns (BarResponse)
 //
-//  -> FooBarClientStream / FooBarServerStream
+//  -> FooBarStreamClient / FooBarStreamServer
 func streamInterface(service, method, stream string) string {
 	return join(service, method, stream)
 }

@@ -1,4 +1,4 @@
-{{define "serverStream" -}}
+{{define "server_stream" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
 
@@ -9,8 +9,8 @@
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    // {{.ServerStream}} is a streaming interface used in the {{$server}} interface.
-    type {{.ServerStream}} interface {
+    // {{.StreamServer}} is a streaming interface used in the {{$server}} interface.
+    type {{.StreamServer}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
       Recv(...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error)
@@ -26,16 +26,16 @@
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type _{{.ServerStream}} struct {
-      stream *yarpcprotobuf.ServerStream
+    type _{{.StreamServer}} struct {
+      stream *yarpcprotobuf.StreamServer
     }
 
-    func (s *_{{.ServerStream}}) Context() context.Context {
+    func (s *_{{.StreamServer}}) Context() context.Context {
       return s.stream.Context()
     }
 
     {{if .ClientStreaming}}
-    func (s *_{{.ServerStream}}) Recv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
+    func (s *_{{.StreamServer}}) Recv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
       msg, err := s.stream.Receive(new{{.RequestType}}, opts...)
       if err != nil {
         return nil, err
@@ -49,7 +49,7 @@
     {{end -}}
 
     {{if .ServerStreaming}}
-    func (s *_{{.ServerStream}}) Send(res *{{goType .Response $gopkg}}, opts ...yarpc.StreamOption) error {
+    func (s *_{{.StreamServer}}) Send(res *{{goType .Response $gopkg}}, opts ...yarpc.StreamOption) error {
       return s.stream.Send(res, opts...)
     }
     {{end -}}

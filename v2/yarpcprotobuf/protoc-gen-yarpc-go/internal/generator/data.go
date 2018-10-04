@@ -52,8 +52,8 @@ type Method struct {
 	ClientStreaming bool
 	ServerStreaming bool
 
-	ClientStream string
-	ServerStream string
+	StreamClient string
+	StreamServer string
 	RequestType  string
 	ResponseType string
 }

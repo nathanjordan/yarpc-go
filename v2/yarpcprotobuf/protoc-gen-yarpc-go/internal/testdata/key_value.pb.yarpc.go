@@ -22,16 +22,16 @@ type KeyValueClient interface {
 	Bar(
 		context.Context,
 		...yarpc.CallOption,
-	) (KeyValueBarClientStream, error)
+	) (KeyValueBarStreamClient, error)
 	Baz(
 		context.Context,
 		*GetRequest,
 		...yarpc.CallOption,
-	) (KeyValueBazClientStream, error)
+	) (KeyValueBazStreamClient, error)
 	Qux(
 		context.Context,
 		...yarpc.CallOption,
-	) (KeyValueQuxClientStream, error)
+	) (KeyValueQuxStreamClient, error)
 }
 
 // NewKeyValueClient builds a new YARPC client for the KeyValue service.
@@ -55,15 +55,15 @@ func (c *_KeyValueCaller) Foo(ctx context.Context, req *GetRequest, opts ...yarp
 	return res, nil
 }
 
-func (c *_KeyValueCaller) Bar(ctx context.Context, opts ...yarpc.CallOption) (KeyValueBarClientStream, error) {
+func (c *_KeyValueCaller) Bar(ctx context.Context, opts ...yarpc.CallOption) (KeyValueBarStreamClient, error) {
 	s, err := c.stream.CallStream(ctx, "Bar", opts...)
 	if err != nil {
 		return err
 	}
-	return &_KeyValueBarClientStream{stream: s}, nil
+	return &_KeyValueBarStreamClient{stream: s}, nil
 }
 
-func (c *_KeyValueCaller) Baz(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (KeyValueBazClientStream, error) {
+func (c *_KeyValueCaller) Baz(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (KeyValueBazStreamClient, error) {
 	s, err := c.stream.CallStream(ctx, "Baz", opts...)
 	if err != nil {
 		return err
@@ -71,52 +71,52 @@ func (c *_KeyValueCaller) Baz(ctx context.Context, req *GetRequest, opts ...yarp
 	if err := s.Send(req); err != nil {
 		return nil, err
 	}
-	return &_KeyValueBazClientStream{stream: s}, nil
+	return &_KeyValueBazStreamClient{stream: s}, nil
 }
 
-func (c *_KeyValueCaller) Qux(ctx context.Context, opts ...yarpc.CallOption) (KeyValueQuxClientStream, error) {
+func (c *_KeyValueCaller) Qux(ctx context.Context, opts ...yarpc.CallOption) (KeyValueQuxStreamClient, error) {
 	s, err := c.stream.CallStream(ctx, "Qux", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &_KeyValueQuxClientStream{stream: s}, nil
+	return &_KeyValueQuxStreamClient{stream: s}, nil
 }
 
-// KeyValueBarClientStream is a streaming interface used in the KeyValueClient interface.
-type KeyValueBarClientStream interface {
+// KeyValueBarStreamClient is a streaming interface used in the KeyValueClient interface.
+type KeyValueBarStreamClient interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
 	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
 }
 
-// KeyValueBazClientStream is a streaming interface used in the KeyValueClient interface.
-type KeyValueBazClientStream interface {
+// KeyValueBazStreamClient is a streaming interface used in the KeyValueClient interface.
+type KeyValueBazStreamClient interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
-// KeyValueQuxClientStream is a streaming interface used in the KeyValueClient interface.
-type KeyValueQuxClientStream interface {
+// KeyValueQuxStreamClient is a streaming interface used in the KeyValueClient interface.
+type KeyValueQuxStreamClient interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
 	Recv(...yarpc.StreamOption) (*GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
-type _KeyValueBarClientStream struct {
-	stream *yarpcprotobuf.ClientStream
+type _KeyValueBarStreamClient struct {
+	stream *yarpcprotobuf.StreamClient
 }
 
-func (c *_KeyValueBarClientStream) Context() context.Context {
+func (c *_KeyValueBarStreamClient) Context() context.Context {
 	return c.stream.Context()
 }
 
-func (c *_KeyValueBarClientStream) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
+func (c *_KeyValueBarStreamClient) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
 	return c.stream.Send(req, opts...)
 }
 
-func (c *_KeyValueBarClientStream) CloseAndRecv(opts ...yarpc.StreamOption) (*GetRequest, error) {
+func (c *_KeyValueBarStreamClient) CloseAndRecv(opts ...yarpc.StreamOption) (*GetRequest, error) {
 	if err := c.stream.Close(opts...); err != nil {
 		return nil, err
 	}
@@ -131,15 +131,15 @@ func (c *_KeyValueBarClientStream) CloseAndRecv(opts ...yarpc.StreamOption) (*Ge
 	return res, err
 }
 
-type _KeyValueBazClientStream struct {
-	stream *yarpcprotobuf.ClientStream
+type _KeyValueBazStreamClient struct {
+	stream *yarpcprotobuf.StreamClient
 }
 
-func (c *_KeyValueBazClientStream) Context() context.Context {
+func (c *_KeyValueBazStreamClient) Context() context.Context {
 	return c.stream.Context()
 }
 
-func (c *_KeyValueBazClientStream) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
+func (c *_KeyValueBazStreamClient) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
 	msg, err := c.stream.Receive(newKeyValueBazResponse, opts...)
 	if err != nil {
 		return nil, err
@@ -151,23 +151,23 @@ func (c *_KeyValueBazClientStream) Recv(opts ...yarpc.StreamOption) (*GetRespons
 	return res, nil
 }
 
-func (c *_KeyValueBazClientStream) CloseSend(opts ...yarpc.StreamOption) error {
+func (c *_KeyValueBazStreamClient) CloseSend(opts ...yarpc.StreamOption) error {
 	return c.stream.Close(opts...)
 }
 
-type _KeyValueQuxClientStream struct {
-	stream *yarpcprotobuf.ClientStream
+type _KeyValueQuxStreamClient struct {
+	stream *yarpcprotobuf.StreamClient
 }
 
-func (c *_KeyValueQuxClientStream) Context() context.Context {
+func (c *_KeyValueQuxStreamClient) Context() context.Context {
 	return c.stream.Context()
 }
 
-func (c *_KeyValueQuxClientStream) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
+func (c *_KeyValueQuxStreamClient) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
 	return c.stream.Send(req, opts...)
 }
 
-func (c *_KeyValueQuxClientStream) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
+func (c *_KeyValueQuxStreamClient) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
 	msg, err := c.stream.Receive(newKeyValueQuxResponse, opts...)
 	if err != nil {
 		return nil, err
@@ -179,7 +179,7 @@ func (c *_KeyValueQuxClientStream) Recv(opts ...yarpc.StreamOption) (*GetRespons
 	return res, nil
 }
 
-func (c *_KeyValueQuxClientStream) CloseSend(opts ...yarpc.StreamOption) error {
+func (c *_KeyValueQuxStreamClient) CloseSend(opts ...yarpc.StreamOption) error {
 	return c.stream.Close(opts...)
 }
 
@@ -190,14 +190,14 @@ type KeyValueServer interface {
 		*GetRequest,
 	) (*GetResponse, error)
 	Bar(
-		KeyValueBarServerStream,
-	) (KeyValueBarServerStream, error)
+		KeyValueBarStreamServer,
+	) (KeyValueBarStreamServer, error)
 	Baz(
 		*GetRequest,
-		KeyValueBazServerStream,
+		KeyValueBazStreamServer,
 	) error
 	Qux(
-		KeyValueQuxServerStream,
+		KeyValueQuxStreamServer,
 	) error
 }
 
@@ -260,15 +260,15 @@ func (h *_KeyValueHandler) Foo(ctx context.Context, m proto.Message) (proto.Mess
 	return h.server.Foo(ctx, req)
 }
 
-func (h *_KeyValueHandler) Bar(s *yarpcprotobuf.ServerStream) error {
-	res, err := h.server.Bar(&_KeyValueBarServerStream{server: s})
+func (h *_KeyValueHandler) Bar(s *yarpcprotobuf.StreamServer) error {
+	res, err := h.server.Bar(&_KeyValueBarStreamServer{server: s})
 	if err != nil {
 		return err
 	}
 	return s.Send(res)
 }
 
-func (h *_KeyValueHandler) Baz(s *yarpcprotobuf.ServerStream) error {
+func (h *_KeyValueHandler) Baz(s *yarpcprotobuf.StreamServer) error {
 	recv, err := s.Receive(newKeyValueBazRequest)
 	if err != nil {
 		return err
@@ -277,41 +277,41 @@ func (h *_KeyValueHandler) Baz(s *yarpcprotobuf.ServerStream) error {
 	if req == nil {
 		return yarpcprotobuf.CastError(_emptyKeyValueBazRequest, recv)
 	}
-	return h.server.Baz(req, &_KeyValueBazServerStream{server: s})
+	return h.server.Baz(req, &_KeyValueBazStreamServer{server: s})
 }
 
-func (h *_KeyValueHandler) Qux(s *yarpcprotobuf.ServerStream) error {
-	return h.server.Qux(&_KeyValueQuxServerStream{stream: s})
+func (h *_KeyValueHandler) Qux(s *yarpcprotobuf.StreamServer) error {
+	return h.server.Qux(&_KeyValueQuxStreamServer{stream: s})
 }
 
-// KeyValueBarServerStream is a streaming interface used in the KeyValueServer interface.
-type KeyValueBarServerStream interface {
+// KeyValueBarStreamServer is a streaming interface used in the KeyValueServer interface.
+type KeyValueBarStreamServer interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
 }
 
-// KeyValueBazServerStream is a streaming interface used in the KeyValueServer interface.
-type KeyValueBazServerStream interface {
+// KeyValueBazStreamServer is a streaming interface used in the KeyValueServer interface.
+type KeyValueBazStreamServer interface {
 	Context() context.Context
 	Send(*GetResponse, ...yarpc.StreamOption) error
 }
 
-// KeyValueQuxServerStream is a streaming interface used in the KeyValueServer interface.
-type KeyValueQuxServerStream interface {
+// KeyValueQuxStreamServer is a streaming interface used in the KeyValueServer interface.
+type KeyValueQuxStreamServer interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
 	Send(*GetResponse, ...yarpc.StreamOption) error
 }
 
-type _KeyValueBarServerStream struct {
-	stream *yarpcprotobuf.ServerStream
+type _KeyValueBarStreamServer struct {
+	stream *yarpcprotobuf.StreamServer
 }
 
-func (s *_KeyValueBarServerStream) Context() context.Context {
+func (s *_KeyValueBarStreamServer) Context() context.Context {
 	return s.stream.Context()
 }
 
-func (s *_KeyValueBarServerStream) Recv(opts ...yarpc.StreamOption) (*GetRequest, error) {
+func (s *_KeyValueBarStreamServer) Recv(opts ...yarpc.StreamOption) (*GetRequest, error) {
 	msg, err := s.stream.Receive(newKeyValueBarRequest, opts...)
 	if err != nil {
 		return nil, err
@@ -323,27 +323,27 @@ func (s *_KeyValueBarServerStream) Recv(opts ...yarpc.StreamOption) (*GetRequest
 	return req, nil
 }
 
-type _KeyValueBazServerStream struct {
-	stream *yarpcprotobuf.ServerStream
+type _KeyValueBazStreamServer struct {
+	stream *yarpcprotobuf.StreamServer
 }
 
-func (s *_KeyValueBazServerStream) Context() context.Context {
+func (s *_KeyValueBazStreamServer) Context() context.Context {
 	return s.stream.Context()
 }
 
-func (s *_KeyValueBazServerStream) Send(res *GetResponse, opts ...yarpc.StreamOption) error {
+func (s *_KeyValueBazStreamServer) Send(res *GetResponse, opts ...yarpc.StreamOption) error {
 	return s.stream.Send(res, opts...)
 }
 
-type _KeyValueQuxServerStream struct {
-	stream *yarpcprotobuf.ServerStream
+type _KeyValueQuxStreamServer struct {
+	stream *yarpcprotobuf.StreamServer
 }
 
-func (s *_KeyValueQuxServerStream) Context() context.Context {
+func (s *_KeyValueQuxStreamServer) Context() context.Context {
 	return s.stream.Context()
 }
 
-func (s *_KeyValueQuxServerStream) Recv(opts ...yarpc.StreamOption) (*GetRequest, error) {
+func (s *_KeyValueQuxStreamServer) Recv(opts ...yarpc.StreamOption) (*GetRequest, error) {
 	msg, err := s.stream.Receive(newKeyValueQuxRequest, opts...)
 	if err != nil {
 		return nil, err
@@ -355,7 +355,7 @@ func (s *_KeyValueQuxServerStream) Recv(opts ...yarpc.StreamOption) (*GetRequest
 	return req, nil
 }
 
-func (s *_KeyValueQuxServerStream) Send(res *GetResponse, opts ...yarpc.StreamOption) error {
+func (s *_KeyValueQuxStreamServer) Send(res *GetResponse, opts ...yarpc.StreamOption) error {
 	return s.stream.Send(res, opts...)
 }
 

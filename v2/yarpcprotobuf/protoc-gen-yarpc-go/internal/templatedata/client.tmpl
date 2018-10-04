@@ -16,7 +16,7 @@
             *{{goType .Request $gopkg}},
           {{end -}}
           ...yarpc.CallOption,
-        ) ({{.ClientStream}}, error)
+        ) ({{.StreamClient}}, error)
       {{else -}}
         {{.Name}}(
           context.Context,
