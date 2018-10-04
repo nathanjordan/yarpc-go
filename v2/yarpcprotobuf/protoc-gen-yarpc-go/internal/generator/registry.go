@@ -10,11 +10,14 @@ import (
 )
 
 const (
+	_caller       = "Caller"
+	_client       = "Client"
+	_handler      = "Handler"
+	_server       = "Server"
+	_request      = "Request"
+	_response     = "Response"
 	_clientStream = "ClientStream"
 	_serverStream = "ServerStream"
-
-	_request  = "Request"
-	_response = "Response"
 )
 
 // registry is used to collect and register all
@@ -135,9 +138,15 @@ func (r *registry) loadMessage(f *File, m *descriptor.DescriptorProto) {
 }
 
 func (r *registry) loadService(f *File, s *descriptor.ServiceDescriptorProto) error {
+	name := s.GetName()
 	svc := &Service{
-		Name:    s.GetName(),
+		Name:    name,
+		FQN:     join(f.Package.Name, name),
 		Package: f.Package,
+		Caller:  fmt.Sprintf("_%s%s", name, _caller),
+		Client:  join(name, _client),
+		Handler: fmt.Sprintf("_%s%s", name, _handler),
+		Server:  join(name, _server),
 	}
 	for _, m := range s.GetMethod() {
 		method, err := r.newMethod(m, s.GetName())

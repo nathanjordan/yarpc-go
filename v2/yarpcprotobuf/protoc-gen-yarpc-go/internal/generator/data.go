@@ -36,6 +36,11 @@ type Service struct {
 	FQN     string
 	Package *Package
 	Methods []*Method
+
+	Caller  string
+	Client  string
+	Handler string
+	Server  string
 }
 
 // Method represents a standard RPC method.
@@ -47,7 +52,6 @@ type Method struct {
 	ClientStreaming bool
 	ServerStreaming bool
 
-	/* Template data */
 	ClientStream string
 	ServerStream string
 	RequestType  string
