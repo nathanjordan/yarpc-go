@@ -5,11 +5,8 @@ package keyvalue;
 option go_package = "keyvaluepb";
 
 message GetRequest {}
-
 message GetResponse {}
-
 message SetRequest {}
-
 message SetResponse {}
 
 service Store {

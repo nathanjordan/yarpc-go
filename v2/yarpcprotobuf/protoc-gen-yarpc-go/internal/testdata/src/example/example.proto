@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package example;
+
+import "src/keyvalue/key_value.proto";
+
+option go_package = "examplepb";
+
+service Example {
+	rpc Get(keyvalue.GetRequest) returns (keyvalue.GetResponse);
+}

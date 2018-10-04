@@ -3,6 +3,7 @@ package generator
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"text/template"
 
 	"go.uber.org/yarpc/v2/yarpcprotobuf/protoc-gen-yarpc-go/internal/templatedata"
@@ -44,6 +45,7 @@ func execTemplate(data *Data) ([]byte, error) {
 	if err := _tmpl.Execute(buffer, data); err != nil {
 		return nil, err
 	}
+	os.Stderr.WriteString(buffer.String())
 	return buffer.Bytes(), nil
 }
 
@@ -51,7 +53,7 @@ func execTemplate(data *Data) ([]byte, error) {
 // It prefixes the type name with the package's alias
 // if it does not belong to the same package.
 func goType(m *Message, pkg string) string {
-	if m.Package.GoPackage != pkg {
+	if m.Package.GoPackage != pkg && m.Package.alias != "" {
 		return fmt.Sprintf("%s.%s", m.Package.alias, m.Name)
 	}
 	return m.Name
