@@ -6,8 +6,8 @@ package keyvalue
 
 import (
 	context "context"
-
 	proto "github.com/gogo/protobuf/proto"
+	fx "go.uber.org/fx"
 	yarpc "go.uber.org/yarpc/v2/yarpc"
 	yarpcprotobuf "go.uber.org/yarpc/v2/yarpcprotobuf"
 )

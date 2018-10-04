@@ -4,22 +4,24 @@ import (
 	"bytes"
 	"fmt"
 	"text/template"
+
+	"go.uber.org/yarpc/v2/yarpcprotobuf/protoc-gen-yarpc-go/internal/templatedata"
 )
 
 var _tmpl = template.Must(
 	parseTemplates(
-		_baseTemplate,
-		_clientTemplate,
-		_callerTemplate,
-		_clientStreamTemplate,
-		_serverTemplate,
-		_handlerTemplate,
-		_serverStreamTemplate,
-		_parametersTemplate,
+		templatedata.MustAsset("internal/templatedata/base.tmpl"),
+		templatedata.MustAsset("internal/templatedata/caller.tmpl"),
+		templatedata.MustAsset("internal/templatedata/client.tmpl"),
+		templatedata.MustAsset("internal/templatedata/client_stream.tmpl"),
+		templatedata.MustAsset("internal/templatedata/handler.tmpl"),
+		templatedata.MustAsset("internal/templatedata/parameters.tmpl"),
+		templatedata.MustAsset("internal/templatedata/server.tmpl"),
+		templatedata.MustAsset("internal/templatedata/server_stream.tmpl"),
 	),
 )
 
-func parseTemplates(templates ...string) (*template.Template, error) {
+func parseTemplates(templates ...[]byte) (*template.Template, error) {
 	t := template.New(_plugin).Funcs(
 		template.FuncMap{
 			"goType":        goType,
@@ -28,7 +30,7 @@ func parseTemplates(templates ...string) (*template.Template, error) {
 		},
 	)
 	for _, tmpl := range templates {
-		_, err := t.Parse(tmpl)
+		_, err := t.Parse(string(tmpl))
 		if err != nil {
 			return nil, err
 		}
@@ -36,7 +38,7 @@ func parseTemplates(templates ...string) (*template.Template, error) {
 	return t, nil
 }
 
-func execTemplate(data interface{}) ([]byte, error) {
+func execTemplate(data *Data) ([]byte, error) {
 	buffer := bytes.NewBuffer(nil)
 	if err := _tmpl.Execute(buffer, data); err != nil {
 		return nil, err

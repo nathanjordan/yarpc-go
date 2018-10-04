@@ -20,7 +20,7 @@ func newImports(paths ...string) Imports {
 
 // Add adds the path to the imports map, initially using the base directory
 // as the package alias. If this alias is already in use, we continue to
-// prepend the remaining filepath base elements until we have receive a unique
+// prepend the remaining filepath elements until we have receive a unique
 // alias. If all of the path elements are exhausted, a '_' is continually used
 // until we create a unique alias.
 //

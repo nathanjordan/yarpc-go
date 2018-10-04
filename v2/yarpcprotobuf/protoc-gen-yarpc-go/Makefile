@@ -1,10 +1,15 @@
+TEMPLATE_DATA = internal/templatedata
+
 TEMPLATES = \
-	internal/template/decorator.tmpl \
-	internal/template/gluefx.tmpl \
-	internal/template/integration.tmpl \
-	internal/template/method.tmpl \
-	internal/template/wrapper.tmpl
+	$(TEMPLATE_DATA)/base.tmpl \
+	$(TEMPLATE_DATA)/caller.tmpl \
+	$(TEMPLATE_DATA)/client.tmpl \
+	$(TEMPLATE_DATA)/client_stream.tmpl \
+	$(TEMPLATE_DATA)/handler.tmpl \
+	$(TEMPLATE_DATA)/parameters.tmpl \
+	$(TEMPLATE_DATA)/server.tmpl \
+	$(TEMPLATE_DATA)/server_stream.tmpl
 
 templates: $(TEMPLATES)
 	go get -u github.com/jteeuwen/go-bindata/go-bindata
-	go-bindata -pkg templatedata -o ./internal/templatedata/bindata.go ./internal/templatedata/
+	go-bindata -pkg templatedata -o ./$(TEMPLATE_DATA)/bindata.go ./$(TEMPLATE_DATA)
