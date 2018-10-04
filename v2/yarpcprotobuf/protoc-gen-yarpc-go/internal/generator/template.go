@@ -3,7 +3,6 @@ package generator
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"text/template"
 
 	"go.uber.org/yarpc/v2/yarpcprotobuf/protoc-gen-yarpc-go/internal/templatedata"
@@ -45,7 +44,6 @@ func execTemplate(data *Data) ([]byte, error) {
 	if err := _tmpl.Execute(buffer, data); err != nil {
 		return nil, err
 	}
-	os.Stderr.WriteString(buffer.String())
 	return buffer.Bytes(), nil
 }
 

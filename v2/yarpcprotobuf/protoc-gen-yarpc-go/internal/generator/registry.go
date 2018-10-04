@@ -35,8 +35,7 @@ type registry struct {
 	imports  Imports
 
 	/* Plugin parameters */
-	importPath string
-	packages   map[string]string
+	packages map[string]string
 }
 
 func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
@@ -57,12 +56,10 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 		for _, p := range strings.Split(req.GetParameter(), ",") {
 			param := strings.SplitN(p, "=", 2)
 			if len(param) != 2 {
-				return nil, fmt.Errorf("plugin flags should include a single '='")
+				return nil, fmt.Errorf("package modifiers should include a single '='")
 			}
 			flag, value := param[0], param[1]
 			switch {
-			case flag == "import_path":
-				r.importPath = value
 			case strings.HasPrefix(flag, "M"):
 				r.packages[flag[1:]] = value
 			default:
@@ -217,7 +214,7 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 
 func (r *registry) newPackage(f *descriptor.FileDescriptorProto) *Package {
 	return &Package{
-		alias:     r.imports.Add(r.getImportPath(f)),
+		alias:     r.imports.Add(r.importPath(f)),
 		name:      f.GetPackage(),
 		GoPackage: goPackage(f),
 	}
@@ -244,17 +241,20 @@ func goPackage(f *descriptor.FileDescriptorProto) string {
 }
 
 // importPath returns the package import path that corresponds to
-// the given file descriptor. If the go_package option explicitly configures
-// an import path, use it. Otherwise, use the directory from which the
-// Protobuf definition is defined.
+// the given file descriptor.
+// We first determine whether the user has provided a package modifier for the
+// file, and use its value if so.
+// Otherwise, we use the go_package option if it is explicitly configured.
+// If neither of these values are set, we cannot confidently determine a valid
+// import path. We default to the file source's directory in this case.
 //
 //  Ex:
-//   ./foo/bar/baz.proto
-//   -> "foo/bar"
+//   protoc --yarpc-go_out=Mfoo/bar=path/to/foo/bar:.
+//   -> "path/to/foo/bar"
 //
-//   option go_package = "gen/proto:bazpb";
-//   -> "gen/proto"
-func (r *registry) getImportPath(f *descriptor.FileDescriptorProto) string {
+//   option go_package = "foo/bar:bazpb";
+//   -> "foo/bar"
+func (r *registry) importPath(f *descriptor.FileDescriptorProto) string {
 	if path, ok := r.packages[f.GetName()]; ok {
 		return path
 	}
@@ -264,7 +264,7 @@ func (r *registry) getImportPath(f *descriptor.FileDescriptorProto) string {
 		return gopkg[:idx]
 	}
 
-	return filepath.Join(r.importPath, filepath.Dir(f.GetName()))
+	return filepath.Dir(f.GetName())
 }
 
 func join(s ...string) string {
