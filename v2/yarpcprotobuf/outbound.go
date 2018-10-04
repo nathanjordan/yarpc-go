@@ -48,34 +48,35 @@ type StreamClient interface {
 }
 
 type client struct {
-	c        yarpc.Client
-	encoding yarpc.Encoding
+	c            yarpc.Client
+	encoding     yarpc.Encoding
+	protoService string
 }
 
 // NewClient creates a new client.
-func NewClient(c yarpc.Client, opts ...ClientOption) Client {
-	return newClient(c, opts...)
+func NewClient(c yarpc.Client, protoService string, opts ...ClientOption) Client {
+	return newClient(c, protoService, opts...)
 }
 
 // NewStreamClient creates a new stream client.
-func NewStreamClient(c yarpc.Client, opts ...ClientOption) StreamClient {
-	return newClient(c, opts...)
+func NewStreamClient(c yarpc.Client, protoService string, opts ...ClientOption) StreamClient {
+	return newClient(c, protoService, opts...)
 }
 
-func newClient(c yarpc.Client, opts ...ClientOption) *client {
-	cli := &client{c: c, encoding: Encoding}
+func newClient(c yarpc.Client, service string, opts ...ClientOption) *client {
+	cli := &client{c: c, encoding: Encoding, protoService: service}
 	for _, o := range opts {
 		o.apply(cli)
 	}
 	return cli
 }
 
-func (c *client) CallStream(ctx context.Context, service, method string, opts ...yarpc.CallOption) (*ClientStream, error) {
+func (c *client) CallStream(ctx context.Context, method string, opts ...yarpc.CallOption) (*ClientStream, error) {
 	call, err := yarpc.NewStreamOutboundCall(opts...)
 	if err != nil {
 		return nil, err
 	}
-	ctx, req, err := c.toRequest(ctx, service, method, call)
+	ctx, req, err := c.toRequest(ctx, method, call)
 	if err != nil {
 		return nil, err
 	}
@@ -88,14 +89,13 @@ func (c *client) CallStream(ctx context.Context, service, method string, opts ..
 
 func (c *client) Call(
 	ctx context.Context,
-	service string,
 	method string,
 	proto proto.Message,
 	create func() proto.Message,
 	opts ...yarpc.CallOption,
 ) (proto.Message, error) {
 	call := yarpc.NewOutboundCall(opts...)
-	ctx, req, err := c.toRequest(ctx, service, method, call)
+	ctx, req, err := c.toRequest(ctx, method, call)
 	if err != nil {
 		return nil, err
 	}
@@ -132,11 +132,11 @@ func (c *client) Call(
 // Note that the provided service corresponds to the Proto service name.
 // This includes the service's package name, such as foo.Bar, where
 // Bar is a service declared in the foo package.
-func (c *client) toRequest(ctx context.Context, service, method string, call *yarpc.OutboundCall) (context.Context, *yarpc.Request, error) {
+func (c *client) toRequest(ctx context.Context, method string, call *yarpc.OutboundCall) (context.Context, *yarpc.Request, error) {
 	req := &yarpc.Request{
 		Caller:    c.c.Caller,
 		Service:   c.c.Service,
-		Procedure: yarpcprocedure.ToName(service, method),
+		Procedure: yarpcprocedure.ToName(c.protoService, method),
 		Encoding:  c.encoding,
 	}
 
