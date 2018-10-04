@@ -29,24 +29,6 @@ const _serverTemplate = `
     {{end -}}
   }
 
-
-  {{/* Stream server interfaces */}}
-
-  {{range .Methods -}}
-    {{if or .ClientStreaming .ServerStreaming}}
-    // {{.ServerStream}} is a streaming interface used in the {{$svc}}}Server interface.
-    type {{.ServerStream}} interface {
-      Context() context.Context
-    {{if .ClientStreaming -}}
-      Recv(...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error)
-    {{end -}}
-    {{if .ServerStreaming -}}
-      Send(*{{goType .Response $gopkg}}, ...yarpc.StreamOption) error
-    {{end -}}
-    }
-    {{end -}}
-  {{end -}}
-
 {{end -}}
 
 {{end -}}{{end -}}

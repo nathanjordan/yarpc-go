@@ -19,6 +19,7 @@ package {{.File.Package.GoPackage}}
 {{template "caller" . -}}
 {{template "server" . -}}
 {{template "handler" . -}}
+{{template "serverStream" . -}}
 {{template "procedures" . -}}
 {{template "parameters" . -}}
 `
