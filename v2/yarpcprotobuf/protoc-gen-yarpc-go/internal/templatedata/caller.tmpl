@@ -3,8 +3,7 @@
 {{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
-  {{$svc := .Name}}
-  {{$caller := printf "_%s%s" $svc "Caller"}}
+  {{$caller := .Caller}}
 
   {{/* Caller implementation */}}
 

@@ -3,13 +3,12 @@
 {{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
-  {{$svc := .Name}}
-  {{$handler := printf "_%s%s" $svc "Handler"}}
+  {{$handler := .Handler}}
 
   {{/* Handler implementation */}}
 
   type {{$handler}} struct {
-    server {{$svc}}Server
+    server {{.Server}}
   }
 
   {{range .Methods}}

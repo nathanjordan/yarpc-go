@@ -3,13 +3,13 @@
 {{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
-  {{$svc := .Name}}
+  {{$server := .Server}}
 
   {{/* Server stream interfaces */}}
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    // {{.ServerStream}} is a streaming interface used in the {{$svc}}}Server interface.
+    // {{.ServerStream}} is a streaming interface used in the {{$server}} interface.
     type {{.ServerStream}} interface {
       Context() context.Context
     {{if .ClientStreaming -}}
