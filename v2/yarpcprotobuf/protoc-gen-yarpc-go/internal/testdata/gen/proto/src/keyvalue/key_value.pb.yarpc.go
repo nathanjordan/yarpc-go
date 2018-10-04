@@ -156,7 +156,7 @@ type FxStoreClientResult struct {
 func NewFxStoreClient(_ string, opts ...yarpcprotobuf.ClientOption) interface{} {
 	return func(p FxStoreClientParams) FxStoreClientResult {
 		return FxStoreClientResult{
-			Client: NewFxStoreClient(p.Client, opts...),
+			Client: NewStoreClient(p.Client, opts...),
 		}
 	}
 }

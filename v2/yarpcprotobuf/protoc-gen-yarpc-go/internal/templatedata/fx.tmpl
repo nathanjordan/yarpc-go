@@ -35,7 +35,7 @@
   func New{{.FxClient}}(_ string, opts ...yarpcprotobuf.ClientOption) interface{} {
     return func(p {{.FxClient}}Params) {{.FxClient}}Result {
       return {{.FxClient}}Result{
-        Client: New{{.FxClient}}(p.Client, opts...),
+        Client: New{{.Client}}(p.Client, opts...),
       }
     }
   }
