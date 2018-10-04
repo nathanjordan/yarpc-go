@@ -11,8 +11,6 @@
     server {{.Server}}
   }
 
-  var _ {{.Server}} = (*{{$serverImpl}})(nil)
-
   {{range .Methods}}
     {{if and .ClientStreaming .ServerStreaming -}}
       func (h *{{$serverImpl}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
@@ -39,7 +37,11 @@
         return h.server.{{.Name}}(req, &{{.StreamServerImpl}}{server: s})
       }
     {{else -}}
-      func (h *{{$serverImpl}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}) (proto.Message, error) {
+      func (h *{{$serverImpl}}) {{.Name}}(ctx context.Context, m proto.Message) (proto.Message, error) {
+        req, _ := m.(*{{goType .Request $gopkg}})
+        if req == nil {
+          return nil, yarpcprotobuf.CastError({{.EmptyRequest}}, m)
+        }
         return h.server.{{.Name}}(ctx, req)
       }
     {{end -}}

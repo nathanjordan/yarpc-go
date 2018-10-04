@@ -41,7 +41,7 @@
             Handler: yarpcprotobuf.NewUnaryHandler(
               yarpcprotobuf.UnaryHandlerParams{
                 Handle: h.{{.Name}},
-                Create: new{{$svc}}{{.Name}}Request(),
+                Create: new{{$svc}}{{.Name}}Request,
               },
             ),
           },

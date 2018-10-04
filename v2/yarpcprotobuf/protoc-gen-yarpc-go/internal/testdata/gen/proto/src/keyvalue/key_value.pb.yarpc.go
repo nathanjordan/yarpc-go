@@ -86,7 +86,7 @@ func BuildStoreProcedures(s StoreServer) []yarpc.Procedure {
 					Handler: yarpcprotobuf.NewUnaryHandler(
 						yarpcprotobuf.UnaryHandlerParams{
 							Handle: h.Get,
-							Create: newStoreGetRequest(),
+							Create: newStoreGetRequest,
 						},
 					),
 				},
@@ -95,7 +95,7 @@ func BuildStoreProcedures(s StoreServer) []yarpc.Procedure {
 					Handler: yarpcprotobuf.NewUnaryHandler(
 						yarpcprotobuf.UnaryHandlerParams{
 							Handle: h.Set,
-							Create: newStoreSetRequest(),
+							Create: newStoreSetRequest,
 						},
 					),
 				},
@@ -109,13 +109,19 @@ type _StoreServer struct {
 	server StoreServer
 }
 
-var _ StoreServer = (*_StoreServer)(nil)
-
-func (h *_StoreServer) Get(ctx context.Context, req *common.GetRequest) (proto.Message, error) {
+func (h *_StoreServer) Get(ctx context.Context, m proto.Message) (proto.Message, error) {
+	req, _ := m.(*common.GetRequest)
+	if req == nil {
+		return nil, yarpcprotobuf.CastError(_emptyStoreGetRequest, m)
+	}
 	return h.server.Get(ctx, req)
 }
 
-func (h *_StoreServer) Set(ctx context.Context, req *common.SetRequest) (proto.Message, error) {
+func (h *_StoreServer) Set(ctx context.Context, m proto.Message) (proto.Message, error) {
+	req, _ := m.(*common.SetRequest)
+	if req == nil {
+		return nil, yarpcprotobuf.CastError(_emptyStoreSetRequest, m)
+	}
 	return h.server.Set(ctx, req)
 }
 
