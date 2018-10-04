@@ -36,7 +36,7 @@ type KeyValueClient interface {
 
 // NewKeyValueClient builds a new YARPC client for the KeyValue service.
 func NewKeyValueClient(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) KeyValueClient {
-	return &_KeyValueServer{stream: yarpcprotobuf.NewStreamClient(c, "keyvalue.KeyValue", opts...)}
+	return &_KeyValueClient{stream: yarpcprotobuf.NewStreamClient(c, "keyvalue.KeyValue", opts...)}
 }
 
 type _KeyValueClient struct {
