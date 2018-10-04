@@ -8,7 +8,7 @@ const _serverStreamTemplate = `
 {{range .Services -}}
   {{$svc := .Name}}
 
-  {{/* Stream server interfaces */}}
+  {{/* Server stream interfaces */}}
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
@@ -24,6 +24,8 @@ const _serverStreamTemplate = `
     }
     {{end -}}
   {{end -}}
+
+  {{/* Server stream implementations */}}
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
@@ -55,7 +57,7 @@ const _serverStreamTemplate = `
     }
     {{end -}}
 
-	{{end -}}
+    {{end -}}
   {{end -}}
 
 {{end -}}

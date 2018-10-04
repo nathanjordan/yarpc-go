@@ -50,7 +50,6 @@ type Method struct {
 	/* Template data */
 	ClientStream string
 	ServerStream string
-
 	RequestType  string
 	ResponseType string
 }
