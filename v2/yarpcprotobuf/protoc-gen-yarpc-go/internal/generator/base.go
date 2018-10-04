@@ -21,6 +21,5 @@ package {{.File.Package.GoPackage}}
 {{template "server" . -}}
 {{template "handler" . -}}
 {{template "serverStream" . -}}
-{{template "procedures" . -}}
 {{template "parameters" . -}}
 `

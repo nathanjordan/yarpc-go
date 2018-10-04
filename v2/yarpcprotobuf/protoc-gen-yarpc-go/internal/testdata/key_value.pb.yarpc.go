@@ -6,8 +6,8 @@ package keyvalue
 
 import (
 	context "context"
+
 	proto "github.com/gogo/protobuf/proto"
-	fx "go.uber.org/fx"
 	yarpc "go.uber.org/yarpc/v2/yarpc"
 	yarpcprotobuf "go.uber.org/yarpc/v2/yarpcprotobuf"
 )
@@ -32,6 +32,11 @@ type KeyValueClient interface {
 		context.Context,
 		...yarpc.CallOption,
 	) (KeyValueQuxClientStream, error)
+}
+
+// NewKeyValueClient builds a new YARPC client for the KeyValue service.
+func NewKeyValueClient(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) KeyValueClient {
+	return &_KeyValueCaller{stream: yarpcprotobuf.NewStreamClient(c, "KeyValue", opts...)}
 }
 
 type _KeyValueCaller struct {
@@ -121,7 +126,7 @@ func (c *_KeyValueBarClientStream) CloseAndRecv(opts ...yarpc.StreamOption) (*Ge
 	}
 	res, ok := msg.(*GetResponse)
 	if !ok {
-		return nil, protobuf.CastError(_emptyKeyValueBarResponse, msg)
+		return nil, yarpcprotobuf.CastError(_emptyKeyValueBarResponse, msg)
 	}
 	return res, err
 }
@@ -196,6 +201,53 @@ type KeyValueServer interface {
 	) error
 }
 
+// BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
+func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
+	h := &_KeyValueHandler{server: s}
+	return yarpcprotobuf.Procedures(
+		yarpcprotobuf.ProceduresParams{
+			Service: "KeyValue",
+			Unary: []yarpcprotobuf.UnaryProceduresParams{
+				{
+					MethodName: "Foo",
+					Handler: yarpcprotobuf.NewUnaryHandler{
+						yarpcprotobuf.UnaryHandlerParams{
+							Handle: h.Foo,
+							Create: newKeyValueFooRequest(),
+						},
+					},
+				},
+			},
+			Stream: []yarpcprotobuf.StreamProceduresParams{
+				{
+					MethodName: "Bar",
+					Handler: yarpcprotobuf.NewStreamHandler{
+						yarpcprotobuf.StreamHandlerParams{
+							Handle: h.Bar,
+						},
+					},
+				},
+				{
+					MethodName: "Baz",
+					Handler: yarpcprotobuf.NewStreamHandler{
+						yarpcprotobuf.StreamHandlerParams{
+							Handle: h.Baz,
+						},
+					},
+				},
+				{
+					MethodName: "Qux",
+					Handler: yarpcprotobuf.NewStreamHandler{
+						yarpcprotobuf.StreamHandlerParams{
+							Handle: h.Qux,
+						},
+					},
+				},
+			},
+		},
+	)
+}
+
 type _KeyValueHandler struct {
 	server KeyValueServer
 }
@@ -203,7 +255,7 @@ type _KeyValueHandler struct {
 func (h *_KeyValueHandler) Foo(ctx context.Context, m proto.Message) (proto.Message, error) {
 	req, _ := m.(*GetRequest)
 	if req == nil {
-		return nil, protobuf.CastError(_emptyKeyValueFooRequest, m)
+		return nil, yarpcprotobuf.CastError(_emptyKeyValueFooRequest, m)
 	}
 	return h.server.Foo(ctx, req)
 }
@@ -305,53 +357,6 @@ func (s *_KeyValueQuxServerStream) Recv(opts ...yarpc.StreamOption) (*GetRequest
 
 func (s *_KeyValueQuxServerStream) Send(res *GetResponse, opts ...yarpc.StreamOption) error {
 	return s.stream.Send(res, opts...)
-}
-
-// BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
-func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
-	h := &_KeyValueHandler{server: s}
-	return yarpcprotobuf.Procedures(
-		yarpcprotobuf.ProceduresParams{
-			Service: "KeyValue",
-			Unary: []yarpcprotobuf.UnaryProceduresParams{
-				{
-					MethodName: "Foo",
-					Handler: yarpcprotobuf.NewUnaryHandler{
-						yarpcprotobuf.UnaryHandlerParams{
-							Handle: h.Foo,
-							Create: newKeyValueFooRequest(),
-						},
-					},
-				},
-			},
-			Stream: []yarpcprotobuf.StreamProceduresParams{
-				{
-					MethodName: "Bar",
-					Handler: yarpcprotobuf.NewStreamHandler{
-						yarpcprotobuf.StreamHandlerParams{
-							Handle: h.Bar,
-						},
-					},
-				},
-				{
-					MethodName: "Baz",
-					Handler: yarpcprotobuf.NewStreamHandler{
-						yarpcprotobuf.StreamHandlerParams{
-							Handle: h.Baz,
-						},
-					},
-				},
-				{
-					MethodName: "Qux",
-					Handler: yarpcprotobuf.NewStreamHandler{
-						yarpcprotobuf.StreamHandlerParams{
-							Handle: h.Qux,
-						},
-					},
-				},
-			},
-		},
-	)
 }
 
 func newKeyValueFooRequest()  { return &GetRequest{} }

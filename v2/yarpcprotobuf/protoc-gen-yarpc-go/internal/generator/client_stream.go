@@ -76,7 +76,7 @@ const _clientStreamTemplate = `
       }
       res, ok := msg.(*{{goType .Response $gopkg}})
       if !ok {
-        return nil, protobuf.CastError(_empty{{.ResponseType}}, msg)
+        return nil, yarpcprotobuf.CastError(_empty{{.ResponseType}}, msg)
       }
       return res, err
     }

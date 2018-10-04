@@ -31,6 +31,13 @@ const _clientTemplate = `
     {{end -}}
   }
 
+  {{/* Client construction */}}
+
+  // New{{$svc}}Client builds a new YARPC client for the {{$svc}} service.
+  func New{{$svc}}Client(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) {{$svc}}Client {
+    return &_{{$svc}}Caller{stream: yarpcprotobuf.NewStreamClient(c, {{printf "%q" $svc}}, opts...)}
+  }
+
 {{end -}}
 
 {{end -}}{{end -}}

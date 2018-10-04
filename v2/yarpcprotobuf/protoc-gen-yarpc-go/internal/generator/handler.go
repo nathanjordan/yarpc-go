@@ -44,7 +44,7 @@ const _handlerTemplate = `
       func (h *{{$handler}}) {{.Name}}(ctx context.Context, m proto.Message) (proto.Message, error) {
         req, _ := m.(*{{goType .Request $gopkg}})
         if req == nil {
-          return nil, protobuf.CastError(_empty{{.RequestType}}, m)
+          return nil, yarpcprotobuf.CastError(_empty{{.RequestType}}, m)
         }
         return h.server.{{.Name}}(ctx, req)
       }
