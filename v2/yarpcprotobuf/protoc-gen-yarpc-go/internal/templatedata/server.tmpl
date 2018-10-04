@@ -1,6 +1,3 @@
-package generator
-
-const _serverTemplate = `
 {{define "server" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
@@ -68,4 +65,3 @@ const _serverTemplate = `
 {{end -}}
 
 {{end -}}{{end -}}
-`

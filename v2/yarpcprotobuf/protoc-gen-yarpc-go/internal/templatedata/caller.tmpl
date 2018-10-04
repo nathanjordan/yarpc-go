@@ -1,6 +1,3 @@
-package generator
-
-const _callerTemplate = `
 {{define "caller" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
@@ -60,4 +57,3 @@ const _callerTemplate = `
 {{end -}}
 
 {{end -}}{{end -}}
-`

@@ -1,6 +1,3 @@
-package generator
-
-const _handlerTemplate = `
 {{define "handler" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
@@ -53,4 +50,3 @@ const _handlerTemplate = `
 {{end -}}
 
 {{end -}}{{end -}}
-`

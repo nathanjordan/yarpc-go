@@ -1,6 +1,3 @@
-package generator
-
-const _parametersTemplate = `
 {{define "parameters" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
@@ -28,4 +25,3 @@ const _parametersTemplate = `
 {{end -}}
 
 {{end -}}{{end -}}
-`
