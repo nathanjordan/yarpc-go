@@ -11,6 +11,8 @@
     stream yarpcprotobuf.StreamClient
   }
 
+  var _ {{.Client}} = (*{{$clientImpl}})(nil)
+
   {{range .Methods}}
     {{if and .ClientStreaming .ServerStreaming -}}
       func (c *{{$clientImpl}}) {{.Name}}(ctx context.Context, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {

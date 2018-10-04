@@ -30,6 +30,8 @@
       stream *yarpcprotobuf.StreamServer
     }
 
+    var _ {{.StreamServer}} = (*{{.StreamServerImpl}})(nil)
+
     func (s *{{.StreamServerImpl}}) Context() context.Context {
       return s.stream.Context()
     }
