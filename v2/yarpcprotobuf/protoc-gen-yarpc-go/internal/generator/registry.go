@@ -141,7 +141,7 @@ func (r *registry) loadService(f *File, s *descriptor.ServiceDescriptorProto) er
 	name := s.GetName()
 	svc := &Service{
 		Name:    name,
-		FQN:     join(f.Package.Name, name),
+		FQN:     fmt.Sprintf("%s.%s", f.Package.Name, name),
 		Package: f.Package,
 		Caller:  fmt.Sprintf("_%s%s", name, _caller),
 		Client:  join(name, _client),

@@ -36,7 +36,7 @@ type KeyValueClient interface {
 
 // NewKeyValueClient builds a new YARPC client for the KeyValue service.
 func NewKeyValueClient(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) KeyValueClient {
-	return &_KeyValueCaller{stream: yarpcprotobuf.NewStreamClient(c, "KeyValue", opts...)}
+	return &_KeyValueCaller{stream: yarpcprotobuf.NewStreamClient(c, "keyvalue.KeyValue", opts...)}
 }
 
 type _KeyValueCaller struct {
@@ -82,21 +82,21 @@ func (c *_KeyValueCaller) Qux(ctx context.Context, opts ...yarpc.CallOption) (Ke
 	return &_KeyValueQuxClientStream{stream: s}, nil
 }
 
-// KeyValueBarClientStream is a streaming interface used in the KeyValue}Client interface.
+// KeyValueBarClientStream is a streaming interface used in the KeyValueClient interface.
 type KeyValueBarClientStream interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
 	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
 }
 
-// KeyValueBazClientStream is a streaming interface used in the KeyValue}Client interface.
+// KeyValueBazClientStream is a streaming interface used in the KeyValueClient interface.
 type KeyValueBazClientStream interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetResponse, error)
 	CloseSend(...yarpc.StreamOption) error
 }
 
-// KeyValueQuxClientStream is a streaming interface used in the KeyValue}Client interface.
+// KeyValueQuxClientStream is a streaming interface used in the KeyValueClient interface.
 type KeyValueQuxClientStream interface {
 	Context() context.Context
 	Send(*GetRequest, ...yarpc.StreamOption) error
@@ -206,7 +206,7 @@ func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
 	h := &_KeyValueHandler{server: s}
 	return yarpcprotobuf.Procedures(
 		yarpcprotobuf.ProceduresParams{
-			Service: "KeyValue",
+			Service: "keyvalue.KeyValue",
 			Unary: []yarpcprotobuf.UnaryProceduresParams{
 				{
 					MethodName: "Foo",
@@ -284,19 +284,19 @@ func (h *_KeyValueHandler) Qux(s *yarpcprotobuf.ServerStream) error {
 	return h.server.Qux(&_KeyValueQuxServerStream{stream: s})
 }
 
-// KeyValueBarServerStream is a streaming interface used in the KeyValue}Server interface.
+// KeyValueBarServerStream is a streaming interface used in the KeyValueServer interface.
 type KeyValueBarServerStream interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
 }
 
-// KeyValueBazServerStream is a streaming interface used in the KeyValue}Server interface.
+// KeyValueBazServerStream is a streaming interface used in the KeyValueServer interface.
 type KeyValueBazServerStream interface {
 	Context() context.Context
 	Send(*GetResponse, ...yarpc.StreamOption) error
 }
 
-// KeyValueQuxServerStream is a streaming interface used in the KeyValue}Server interface.
+// KeyValueQuxServerStream is a streaming interface used in the KeyValueServer interface.
 type KeyValueQuxServerStream interface {
 	Context() context.Context
 	Recv(...yarpc.StreamOption) (*GetRequest, error)
