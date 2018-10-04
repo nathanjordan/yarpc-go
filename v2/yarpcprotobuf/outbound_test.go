@@ -32,6 +32,6 @@ func TestNoResponseHeaders(t *testing.T) {
 	client := &client{}
 	headers := make(map[string]string)
 
-	_, err := client.CallStream(context.Background(), "foo", yarpc.ResponseHeaders(&headers))
+	_, err := client.CallStream(context.Background(), "svc", "foo", yarpc.ResponseHeaders(&headers))
 	assert.EqualError(t, err, "code:invalid-argument message:response headers are not supported for streams")
 }

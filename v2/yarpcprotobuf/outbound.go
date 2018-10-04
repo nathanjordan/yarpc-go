@@ -70,12 +70,12 @@ func newClient(c yarpc.Client, opts ...ClientOption) *client {
 	return cli
 }
 
-func (c *client) CallStream(ctx context.Context, method string, opts ...yarpc.CallOption) (*ClientStream, error) {
+func (c *client) CallStream(ctx context.Context, service, method string, opts ...yarpc.CallOption) (*ClientStream, error) {
 	call, err := yarpc.NewStreamOutboundCall(opts...)
 	if err != nil {
 		return nil, err
 	}
-	ctx, req, err := c.toRequest(ctx, method, call)
+	ctx, req, err := c.toRequest(ctx, service, method, call)
 	if err != nil {
 		return nil, err
 	}
@@ -88,13 +88,14 @@ func (c *client) CallStream(ctx context.Context, method string, opts ...yarpc.Ca
 
 func (c *client) Call(
 	ctx context.Context,
+	service string,
 	method string,
 	proto proto.Message,
 	create func() proto.Message,
 	opts ...yarpc.CallOption,
 ) (proto.Message, error) {
 	call := yarpc.NewOutboundCall(opts...)
-	ctx, req, err := c.toRequest(ctx, method, call)
+	ctx, req, err := c.toRequest(ctx, service, method, call)
 	if err != nil {
 		return nil, err
 	}
@@ -128,11 +129,14 @@ func (c *client) Call(
 	return protoRes, appErr
 }
 
-func (c *client) toRequest(ctx context.Context, method string, call *yarpc.OutboundCall) (context.Context, *yarpc.Request, error) {
+// Note that the provided service corresponds to the Proto service name.
+// This includes the service's package name, such as foo.Bar, where
+// Bar is a service declared in the foo package.
+func (c *client) toRequest(ctx context.Context, service, method string, call *yarpc.OutboundCall) (context.Context, *yarpc.Request, error) {
 	req := &yarpc.Request{
 		Caller:    c.c.Caller,
 		Service:   c.c.Service,
-		Procedure: yarpcprocedure.ToName(c.c.Service, method),
+		Procedure: yarpcprocedure.ToName(service, method),
 		Encoding:  c.encoding,
 	}
 
