@@ -10,5 +10,4 @@ import "google/protobuf/any.proto";
 service Store {
   rpc Get(common.GetRequest) returns (common.GetResponse);
   rpc Set(common.SetRequest) returns (common.SetResponse);
-  rpc Delete(google.protobuf.Any) returns (google.protobuf.Any);
 }
