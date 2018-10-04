@@ -57,17 +57,19 @@ type Service struct {
 
 // Method represents a standard RPC method.
 type Method struct {
-	Name            string
-	Request         *Message
-	Response        *Message
-	ClientStreaming bool
-	ServerStreaming bool
-	StreamClient    string
-	StreamServer    string
-	EmptyRequest    string
-	EmptyResponse   string
-	NewRequest      string
-	NewResponse     string
+	Name             string
+	Request          *Message
+	Response         *Message
+	ClientStreaming  bool
+	ServerStreaming  bool
+	StreamClient     string
+	StreamClientImpl string
+	StreamServer     string
+	StreamServerImpl string
+	EmptyRequest     string
+	EmptyResponse    string
+	NewRequest       string
+	NewResponse      string
 }
 
 // Message represents a Protobuf message definition.

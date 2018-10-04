@@ -26,16 +26,16 @@
 
   {{range .Methods -}}
     {{if or .ClientStreaming .ServerStreaming}}
-    type _{{.StreamServer}} struct {
+    type {{.StreamServerImpl}} struct {
       stream *yarpcprotobuf.StreamServer
     }
 
-    func (s *_{{.StreamServer}}) Context() context.Context {
+    func (s *{{.StreamServerImpl}}) Context() context.Context {
       return s.stream.Context()
     }
 
     {{if .ClientStreaming}}
-    func (s *_{{.StreamServer}}) Recv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
+    func (s *{{.StreamServerImpl}}) Recv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
       msg, err := s.stream.Receive({{.NewRequest}}, opts...)
       if err != nil {
         return nil, err
@@ -49,7 +49,7 @@
     {{end -}}
 
     {{if .ServerStreaming}}
-    func (s *_{{.StreamServer}}) Send(res *{{goType .Response $gopkg}}, opts ...yarpc.StreamOption) error {
+    func (s *{{.StreamServerImpl}}) Send(res *{{goType .Response $gopkg}}, opts ...yarpc.StreamOption) error {
       return s.stream.Send(res, opts...)
     }
     {{end -}}

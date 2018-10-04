@@ -176,17 +176,19 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 	}
 	name := m.GetName()
 	return &Method{
-		Name:            name,
-		Request:         request,
-		Response:        response,
-		ClientStreaming: m.GetClientStreaming(),
-		ServerStreaming: m.GetServerStreaming(),
-		StreamClient:    join(svc, name, _clientStream),
-		StreamServer:    join(svc, name, _serverStream),
-		EmptyRequest:    join(_empty, svc, name, _request),
-		EmptyResponse:   join(_empty, svc, name, _response),
-		NewRequest:      join(_new, svc, name, _request),
-		NewResponse:     join(_new, svc, name, _response),
+		Name:             name,
+		Request:          request,
+		Response:         response,
+		ClientStreaming:  m.GetClientStreaming(),
+		ServerStreaming:  m.GetServerStreaming(),
+		StreamClient:     join(svc, name, _clientStream),
+		StreamClientImpl: join(_implPrefix, svc, name, _clientStream),
+		StreamServer:     join(svc, name, _serverStream),
+		StreamServerImpl: join(_implPrefix, svc, name, _serverStream),
+		EmptyRequest:     join(_empty, svc, name, _request),
+		EmptyResponse:    join(_empty, svc, name, _response),
+		NewRequest:       join(_new, svc, name, _request),
+		NewResponse:      join(_new, svc, name, _response),
 	}, nil
 }
 

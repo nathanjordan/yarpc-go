@@ -18,7 +18,7 @@
         if err != nil {
           return nil, err
         }
-        return &_{{.StreamClient}}{stream: s}, nil
+        return &{{.StreamClientImpl}}{stream: s}, nil
       }
     {{else if .ClientStreaming -}}
       func (c *{{$clientImpl}}) {{.Name}}(ctx context.Context, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
@@ -26,7 +26,7 @@
         if err != nil {
           return err
         }
-        return &_{{.StreamClient}}{stream: s}, nil
+        return &{{.StreamClientImpl}}{stream: s}, nil
       }
     {{else if .ServerStreaming -}}
       func (c *{{$clientImpl}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
@@ -37,7 +37,7 @@
         if err := s.Send(req); err != nil {
           return nil, err
         }
-        return &_{{.StreamClient}}{stream: s}, nil
+        return &{{.StreamClientImpl}}{stream: s}, nil
       }
     {{else -}}
       func (c *{{$clientImpl}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}, opts ...yarpc.CallOption) (*{{goType .Response $gopkg}}, error) {

@@ -31,7 +31,7 @@
 
   // New{{.Client}} builds a new YARPC client for the {{.Name}} service.
   func New{{.Client}}(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) {{.Client}} {
-    return &_{{.Server}}{stream: yarpcprotobuf.NewStreamClient(c, {{printf "%q" .FQN}}, opts...)}
+    return &{{.ClientImpl}}{stream: yarpcprotobuf.NewStreamClient(c, {{printf "%q" .FQN}}, opts...)}
   }
 
 {{end -}}

@@ -14,11 +14,11 @@
   {{range .Methods}}
     {{if and .ClientStreaming .ServerStreaming -}}
       func (h *{{$serverImpl}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
-        return h.server.{{.Name}}(&_{{.StreamServer}}{stream: s})
+        return h.server.{{.Name}}(&{{.StreamServerImpl}}{stream: s})
       }
     {{else if .ClientStreaming -}}
       func (h *{{$serverImpl}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
-        res, err := h.server.{{.Name}}(&_{{.StreamServer}}{server: s})
+        res, err := h.server.{{.Name}}(&{{.StreamServerImpl}}{server: s})
         if err != nil {
           return err
         }
@@ -34,7 +34,7 @@
         if req == nil {
           return yarpcprotobuf.CastError({{.EmptyRequest}}, recv)
         }
-        return h.server.{{.Name}}(req, &_{{.StreamServer}}{server: s})
+        return h.server.{{.Name}}(req, &{{.StreamServerImpl}}{server: s})
       }
     {{else -}}
       func (h *{{$serverImpl}}) {{.Name}}(ctx context.Context, m proto.Message) (proto.Message, error) {
