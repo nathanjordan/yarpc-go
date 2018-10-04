@@ -6,6 +6,7 @@ package keyvalue
 
 import (
 	context "context"
+
 	proto "github.com/gogo/protobuf/proto"
 	fx "go.uber.org/fx"
 	yarpc "go.uber.org/yarpc/v2/yarpc"
@@ -42,6 +43,8 @@ func NewKeyValueClient(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) KeyVa
 type _KeyValueClient struct {
 	stream yarpcprotobuf.StreamClient
 }
+
+var _ KeyValueClient = (*_KeyValueClient)(nil)
 
 func (c *_KeyValueClient) Foo(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (*GetResponse, error) {
 	msg, err := c.stream.Call(ctx, "Foo", req, newKeyValueFooResponse, opts...)
@@ -108,6 +111,8 @@ type _KeyValueBarStreamClient struct {
 	stream *yarpcprotobuf.StreamClient
 }
 
+var _ KeyValueBarStreamClient = (*_KeyValueBarStreamClient)(nil)
+
 func (c *_KeyValueBarStreamClient) Context() context.Context {
 	return c.stream.Context()
 }
@@ -135,6 +140,8 @@ type _KeyValueBazStreamClient struct {
 	stream *yarpcprotobuf.StreamClient
 }
 
+var _ KeyValueBazStreamClient = (*_KeyValueBazStreamClient)(nil)
+
 func (c *_KeyValueBazStreamClient) Context() context.Context {
 	return c.stream.Context()
 }
@@ -158,6 +165,8 @@ func (c *_KeyValueBazStreamClient) CloseSend(opts ...yarpc.StreamOption) error {
 type _KeyValueQuxStreamClient struct {
 	stream *yarpcprotobuf.StreamClient
 }
+
+var _ KeyValueQuxStreamClient = (*_KeyValueQuxStreamClient)(nil)
 
 func (c *_KeyValueQuxStreamClient) Context() context.Context {
 	return c.stream.Context()
@@ -252,6 +261,8 @@ type _KeyValueServer struct {
 	server KeyValueServer
 }
 
+var _ KeyValueServer = (*_KeyValueServer)(nil)
+
 func (h *_KeyValueServer) Foo(ctx context.Context, m proto.Message) (proto.Message, error) {
 	req, _ := m.(*GetRequest)
 	if req == nil {
@@ -307,6 +318,8 @@ type _KeyValueBarStreamServer struct {
 	stream *yarpcprotobuf.StreamServer
 }
 
+var _ KeyValueBarStreamServer = (*_KeyValueBarStreamServer)(nil)
+
 func (s *_KeyValueBarStreamServer) Context() context.Context {
 	return s.stream.Context()
 }
@@ -327,6 +340,8 @@ type _KeyValueBazStreamServer struct {
 	stream *yarpcprotobuf.StreamServer
 }
 
+var _ KeyValueBazStreamServer = (*_KeyValueBazStreamServer)(nil)
+
 func (s *_KeyValueBazStreamServer) Context() context.Context {
 	return s.stream.Context()
 }
@@ -338,6 +353,8 @@ func (s *_KeyValueBazStreamServer) Send(res *GetResponse, opts ...yarpc.StreamOp
 type _KeyValueQuxStreamServer struct {
 	stream *yarpcprotobuf.StreamServer
 }
+
+var _ KeyValueQuxStreamServer = (*_KeyValueQuxStreamServer)(nil)
 
 func (s *_KeyValueQuxStreamServer) Context() context.Context {
 	return s.stream.Context()
