@@ -393,34 +393,34 @@ func NewFxKeyValueClient(_ string, opts ...yarpcprotobuf.ClientOption) interface
 	}
 }
 
-// FxKeyValueProceduresParams defines the paramaters
+// FxKeyValueServerParams defines the paramaters
 // required to provide the KeyValueServer procedures
 // into an Fx application.
-type FxKeyValueProceduresParams struct {
+type FxKeyValueServerParams struct {
 	fx.In
 
 	Server KeyValueServer
 }
 
-// FxKeyValueProceduresResult provides the KeyValueServer
+// FxKeyValueServerResult provides the KeyValueServer
 // procedures into an Fx application.
-type FxKeyValueProceduresResult struct {
+type FxKeyValueServerResult struct {
 	fx.Out
 
 	Procedures []yarpc.Procedure `group:"yarpcfx"`
 }
 
-// NewFxKeyValueProcedures provides the KeyValueServer
+// NewFxKeyValueServer provides the KeyValueServer
 // procedures to an Fx application. It expects
 // a KeyValueServer to be present in the container.
 //
 //  fx.Provide(
-//    keyvalue.NewFxKeyValueProcedures(),
+//    keyvalue.NewFxKeyValueServer(),
 //    ...
 //  )
-func NewFxKeyValueProcedures() interface{} {
-	return func(p FxKeyValueProceduresParams) FxKeyValueProceduresResult {
-		return FxKeyValueProceduresResult{
+func NewFxKeyValueServer() interface{} {
+	return func(p FxKeyValueServerParams) FxKeyValueServerResult {
+		return FxKeyValueServerResult{
 			Procedures: BuildKeyValueProcedures(p.Server),
 		}
 	}
