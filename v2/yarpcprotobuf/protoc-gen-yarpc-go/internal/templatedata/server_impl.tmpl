@@ -1,11 +1,11 @@
-{{define "handler" -}}
+{{define "server_impl" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
-  {{$handler := .Handler}}
+  {{$handler := printf "_%s" .Server}}
 
-  {{/* Handler implementation */}}
+  {{/* Server implementation */}}
 
   type {{$handler}} struct {
     server {{.Server}}
@@ -30,7 +30,7 @@
         if err != nil {
           return err
         }
-        req, _ := recv.(*{{.RequestType}})
+        req, _ := recv.(*{{goType .Request $gopkg}})
         if req == nil {
           return yarpcprotobuf.CastError(_empty{{.RequestType}}, recv)
         }

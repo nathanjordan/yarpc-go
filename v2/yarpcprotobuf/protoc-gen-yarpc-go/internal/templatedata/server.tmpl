@@ -30,7 +30,7 @@
 
   // Build{{$svc}}Procedures constructs the YARPC procedures for the {{$svc}} service.
   func Build{{$svc}}Procedures(s {{.Server}}) []yarpc.Procedure {
-    h := &{{.Handler}}{server: s}
+    h := &_{{.Server}}{server: s}
     return yarpcprotobuf.Procedures(
       yarpcprotobuf.ProceduresParams{
         Service: {{printf "%q" .FQN}},

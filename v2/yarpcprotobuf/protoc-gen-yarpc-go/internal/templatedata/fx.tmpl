@@ -43,7 +43,7 @@ func New{{$fxClient}}(_ string, opts ...yarpcprotobuf.ClientOption) interface{} 
 }
 
 {{/* Fx procedures */}}
-  
+
 {{$fxProcedures := printf "Fx%s%s" .Name "Procedures"}}
 
 // {{$fxProcedures}}Params defines the paramaters

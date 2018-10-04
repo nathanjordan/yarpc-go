@@ -10,9 +10,7 @@ import (
 )
 
 const (
-	_caller       = "Caller"
 	_client       = "Client"
-	_handler      = "Handler"
 	_server       = "Server"
 	_request      = "Request"
 	_response     = "Response"
@@ -141,11 +139,9 @@ func (r *registry) loadService(f *File, s *descriptor.ServiceDescriptorProto) er
 	name := s.GetName()
 	svc := &Service{
 		Name:    name,
-		FQN:     fmt.Sprintf("%s.%s", f.Package.Name, name),
 		Package: f.Package,
-		Caller:  fmt.Sprintf("_%s%s", name, _caller),
+		FQN:     fmt.Sprintf("%s.%s", f.Package.Name, name),
 		Client:  join(name, _client),
-		Handler: fmt.Sprintf("_%s%s", name, _handler),
 		Server:  join(name, _server),
 	}
 	for _, m := range s.GetMethod() {

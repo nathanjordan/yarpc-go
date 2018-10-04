@@ -1,11 +1,11 @@
-{{define "caller" -}}
+{{define "client_impl" -}}
 {{with .File}}
 {{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
-  {{$caller := .Caller}}
+  {{$caller := printf "_%s" .Client}}
 
-  {{/* Caller implementation */}}
+  {{/* Client implementation */}}
 
   type {{$caller}} struct {
     stream yarpcprotobuf.StreamClient

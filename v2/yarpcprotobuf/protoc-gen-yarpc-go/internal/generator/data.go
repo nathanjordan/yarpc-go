@@ -33,14 +33,12 @@ type Package struct {
 // Service represents a Protobuf service definition.
 type Service struct {
 	Name    string
-	FQN     string
 	Package *Package
 	Methods []*Method
 
-	Caller  string
-	Client  string
-	Handler string
-	Server  string
+	FQN    string
+	Client string
+	Server string
 }
 
 // Method represents a standard RPC method.

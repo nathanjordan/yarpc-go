@@ -13,10 +13,10 @@ package {{.File.Package.GoPackage}}
 {{end -}}
 
 {{template "client" . -}}
-{{template "caller" . -}}
+{{template "client_impl" . -}}
 {{template "client_stream" . -}}
 {{template "server" . -}}
-{{template "handler" . -}}
+{{template "server_impl" . -}}
 {{template "server_stream" . -}}
 {{template "fx" . -}}
 {{template "parameters" . -}}
