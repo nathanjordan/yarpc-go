@@ -28,8 +28,8 @@
 
   {{/* Procedure construction */}}
 
-  // Build{{$svc}}Procedures constructs the YARPC procedures for the {{$svc}} service.
-  func Build{{$svc}}Procedures(s {{.Server}}) []yarpc.Procedure {
+  // Build{{.Procedures}} constructs the YARPC procedures for the {{$svc}} service.
+  func Build{{.Procedures}}(s {{.Server}}) []yarpc.Procedure {
     h := &_{{.Server}}{server: s}
     return yarpcprotobuf.Procedures(
       yarpcprotobuf.ProceduresParams{

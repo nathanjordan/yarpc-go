@@ -3,17 +3,16 @@
 {{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
-  {{$caller := printf "_%s" .Client}}
 
   {{/* Client implementation */}}
 
-  type {{$caller}} struct {
+  type {{.ClientImpl}} struct {
     stream yarpcprotobuf.StreamClient
   }
 
   {{range .Methods}}
     {{if and .ClientStreaming .ServerStreaming -}}
-      func (c *{{$caller}}) {{.Name}}(ctx context.Context, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
+      func (c *{{.ClientImpl}}) {{.Name}}(ctx context.Context, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
         s, err := c.stream.CallStream(ctx, {{printf "%q" .Name}}, opts...)
         if err != nil {
           return nil, err
@@ -21,7 +20,7 @@
         return &_{{.StreamClient}}{stream: s}, nil
       }
     {{else if .ClientStreaming -}}
-      func (c *{{$caller}}) {{.Name}}(ctx context.Context, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
+      func (c *{{.ClientImpl}}) {{.Name}}(ctx context.Context, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
         s, err := c.stream.CallStream(ctx, {{printf "%q" .Name}}, opts...)
         if err != nil {
           return err
@@ -29,7 +28,7 @@
         return &_{{.StreamClient}}{stream: s}, nil
       }
     {{else if .ServerStreaming -}}
-      func (c *{{$caller}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
+      func (c *{{.ClientImpl}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}, opts ...yarpc.CallOption) ({{.StreamClient}}, error) {
         s, err := c.stream.CallStream(ctx, {{printf "%q" .Name}}, opts...)
         if err != nil {
           return err
@@ -40,7 +39,7 @@
         return &_{{.StreamClient}}{stream: s}, nil
       }
     {{else -}}
-      func (c *{{$caller}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}, opts ...yarpc.CallOption) (*{{goType .Response $gopkg}}, error) {
+      func (c *{{.ClientImpl}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}, opts ...yarpc.CallOption) (*{{goType .Response $gopkg}}, error) {
         msg, err := c.stream.Call(ctx, {{printf "%q" .Name}}, req, {{.NewResponse}}, opts...)
         if err != nil {
           return nil, err

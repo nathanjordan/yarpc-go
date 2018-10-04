@@ -3,21 +3,20 @@
 {{$gopkg := .Package.GoPackage}}
 
 {{range .Services -}}
-  {{$handler := printf "_%s" .Server}}
 
   {{/* Server implementation */}}
 
-  type {{$handler}} struct {
+  type {{.ServerImpl}} struct {
     server {{.Server}}
   }
 
   {{range .Methods}}
     {{if and .ClientStreaming .ServerStreaming -}}
-      func (h *{{$handler}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
+      func (h *{{.ServerImpl}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
         return h.server.{{.Name}}(&_{{.StreamServer}}{stream: s})
       }
     {{else if .ClientStreaming -}}
-      func (h *{{$handler}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
+      func (h *{{.ServerImpl}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
         res, err := h.server.{{.Name}}(&_{{.StreamServer}}{server: s})
         if err != nil {
           return err
@@ -25,7 +24,7 @@
         return s.Send(res)
       }
     {{else if .ServerStreaming -}}
-      func (h *{{$handler}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
+      func (h *{{.ServerImpl}}) {{.Name}}(s *yarpcprotobuf.StreamServer) error {
         recv, err := s.Receive({{.NewRequest}})
         if err != nil {
           return err
@@ -37,7 +36,7 @@
         return h.server.{{.Name}}(req, &_{{.StreamServer}}{server: s})
       }
     {{else -}}
-      func (h *{{$handler}}) {{.Name}}(ctx context.Context, m proto.Message) (proto.Message, error) {
+      func (h *{{.ServerImpl}}) {{.Name}}(ctx context.Context, m proto.Message) (proto.Message, error) {
         req, _ := m.(*{{goType .Request $gopkg}})
         if req == nil {
           return nil, yarpcprotobuf.CastError({{.EmptyRequest}}, m)

@@ -43,11 +43,16 @@ func (p *Package) fqn(name string) string {
 
 // Service represents a Protobuf service definition.
 type Service struct {
-	Name    string
-	FQN     string
-	Client  string
-	Server  string
-	Methods []*Method
+	Name       string
+	FQN        string
+	Client     string
+	ClientImpl string
+	FxClient   string
+	Server     string
+	ServerImpl string
+	FxServer   string
+	Procedures string
+	Methods    []*Method
 }
 
 // Method represents a standard RPC method.

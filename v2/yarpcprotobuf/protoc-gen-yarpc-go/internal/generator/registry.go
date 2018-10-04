@@ -10,10 +10,13 @@ import (
 )
 
 const (
+	_implPrefix   = "_"
 	_empty        = "_empty"
 	_new          = "new"
+	_fx           = "Fx"
 	_client       = "Client"
 	_server       = "Server"
+	_procedures   = "Procedures"
 	_request      = "Request"
 	_response     = "Response"
 	_clientStream = "StreamClient"
@@ -141,10 +144,15 @@ func (r *registry) loadMessage(f *File, m *descriptor.DescriptorProto) {
 func (r *registry) loadService(f *File, s *descriptor.ServiceDescriptorProto) error {
 	name := s.GetName()
 	svc := &Service{
-		Name:   name,
-		FQN:    f.Package.fqn(name),
-		Client: join(name, _client),
-		Server: join(name, _server),
+		Name:       name,
+		FQN:        f.Package.fqn(name),
+		Client:     join(name, _client),
+		ClientImpl: join(_implPrefix, name, _client),
+		FxClient:   join(_fx, name, _client),
+		Server:     join(name, _server),
+		ServerImpl: join(_implPrefix, name, _server),
+		FxServer:   join(_fx, name, _server),
+		Procedures: join(name, _procedures),
 	}
 	for _, m := range s.GetMethod() {
 		method, err := r.newMethod(m, name)
