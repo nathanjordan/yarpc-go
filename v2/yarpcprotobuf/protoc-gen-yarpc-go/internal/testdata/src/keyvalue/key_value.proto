@@ -4,12 +4,11 @@ package keyvalue;
 
 option go_package = "keyvaluepb";
 
-message GetRequest {}
-message GetResponse {}
-message SetRequest {}
-message SetResponse {}
+import "src/common/common.proto";
+import "google/protobuf/any.proto";
 
 service Store {
-  rpc Get(GetRequest) returns (GetResponse);
-  rpc Set(SetRequest) returns (SetResponse);
+  rpc Get(common.GetRequest) returns (common.GetResponse);
+  rpc Set(common.SetRequest) returns (common.SetResponse);
+  rpc Delete(google.protobuf.Any) returns (google.protobuf.Any);
 }

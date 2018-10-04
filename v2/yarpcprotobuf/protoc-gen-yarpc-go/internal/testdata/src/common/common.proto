@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "commonpb";
+
+message GetRequest {}
+message GetResponse {}
+message SetRequest {}
+message SetResponse {}

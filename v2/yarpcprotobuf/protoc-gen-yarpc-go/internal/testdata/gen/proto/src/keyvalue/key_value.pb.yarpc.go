@@ -10,20 +10,21 @@ import (
 	fx "go.uber.org/fx"
 	yarpc "go.uber.org/yarpc/v2"
 	yarpcprotobuf "go.uber.org/yarpc/v2/yarpcprotobuf"
+	common "go.uber.org/yarpc/v2/yarpcprotobuf/protoc-gen-yarpc-go/internal/testdata/gen/proto/src/common"
 )
 
 // StoreClient is the Store service's client interface.
 type StoreClient interface {
 	Get(
 		context.Context,
-		*GetRequest,
+		*common.GetRequest,
 		...yarpc.CallOption,
-	) (*GetResponse, error)
+	) (*common.GetResponse, error)
 	Set(
 		context.Context,
-		*SetRequest,
+		*common.SetRequest,
 		...yarpc.CallOption,
-	) (*SetResponse, error)
+	) (*common.SetResponse, error)
 }
 
 // NewStoreClient builds a new YARPC client for the Store service.
@@ -37,24 +38,24 @@ type _StoreClient struct {
 
 var _ StoreClient = (*_StoreClient)(nil)
 
-func (c *_StoreClient) Get(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (*GetResponse, error) {
+func (c *_StoreClient) Get(ctx context.Context, req *common.GetRequest, opts ...yarpc.CallOption) (*common.GetResponse, error) {
 	msg, err := c.stream.Call(ctx, "Get", req, newStoreGetResponse, opts...)
 	if err != nil {
 		return nil, err
 	}
-	res, ok := msg.(*GetResponse)
+	res, ok := msg.(*common.GetResponse)
 	if !ok {
 		return nil, yarpcprotobuf.CastError(_emptyStoreGetResponse, res)
 	}
 	return res, nil
 }
 
-func (c *_StoreClient) Set(ctx context.Context, req *SetRequest, opts ...yarpc.CallOption) (*SetResponse, error) {
+func (c *_StoreClient) Set(ctx context.Context, req *common.SetRequest, opts ...yarpc.CallOption) (*common.SetResponse, error) {
 	msg, err := c.stream.Call(ctx, "Set", req, newStoreSetResponse, opts...)
 	if err != nil {
 		return nil, err
 	}
-	res, ok := msg.(*SetResponse)
+	res, ok := msg.(*common.SetResponse)
 	if !ok {
 		return nil, yarpcprotobuf.CastError(_emptyStoreSetResponse, res)
 	}
@@ -65,12 +66,12 @@ func (c *_StoreClient) Set(ctx context.Context, req *SetRequest, opts ...yarpc.C
 type StoreServer interface {
 	Get(
 		context.Context,
-		*GetRequest,
-	) (*GetResponse, error)
+		*common.GetRequest,
+	) (*common.GetResponse, error)
 	Set(
 		context.Context,
-		*SetRequest,
-	) (*SetResponse, error)
+		*common.SetRequest,
+	) (*common.SetResponse, error)
 }
 
 // BuildStoreProcedures constructs the YARPC procedures for the Store service.
@@ -111,7 +112,7 @@ type _StoreServer struct {
 var _ StoreServer = (*_StoreServer)(nil)
 
 func (h *_StoreServer) Get(ctx context.Context, m proto.Message) (proto.Message, error) {
-	req, _ := m.(*GetRequest)
+	req, _ := m.(*common.GetRequest)
 	if req == nil {
 		return nil, yarpcprotobuf.CastError(_emptyStoreGetRequest, m)
 	}
@@ -119,7 +120,7 @@ func (h *_StoreServer) Get(ctx context.Context, m proto.Message) (proto.Message,
 }
 
 func (h *_StoreServer) Set(ctx context.Context, m proto.Message) (proto.Message, error) {
-	req, _ := m.(*SetRequest)
+	req, _ := m.(*common.SetRequest)
 	if req == nil {
 		return nil, yarpcprotobuf.CastError(_emptyStoreSetRequest, m)
 	}
@@ -193,14 +194,14 @@ func NewFxStoreServer() interface{} {
 	}
 }
 
-func newStoreGetRequest()  { return &GetRequest{} }
-func newStoreGetResponse() { return &GetResponse{} }
-func newStoreSetRequest()  { return &SetRequest{} }
-func newStoreSetResponse() { return &SetResponse{} }
+func newStoreGetRequest()  { return &common.GetRequest{} }
+func newStoreGetResponse() { return &common.GetResponse{} }
+func newStoreSetRequest()  { return &common.SetRequest{} }
+func newStoreSetResponse() { return &common.SetResponse{} }
 
 var (
-	_emptyStoreGetRequest  = &GetRequest{}
-	_emptyStoreGetResponse = &GetResponse{}
-	_emptyStoreSetRequest  = &SetRequest{}
-	_emptyStoreSetResponse = &SetResponse{}
+	_emptyStoreGetRequest  = &common.GetRequest{}
+	_emptyStoreGetResponse = &common.GetResponse{}
+	_emptyStoreSetRequest  = &common.SetRequest{}
+	_emptyStoreSetResponse = &common.SetResponse{}
 )
