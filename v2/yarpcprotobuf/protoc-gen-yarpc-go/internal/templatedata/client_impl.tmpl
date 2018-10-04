@@ -41,13 +41,13 @@
       }
     {{else -}}
       func (c *{{$caller}}) {{.Name}}(ctx context.Context, req *{{goType .Request $gopkg}}, opts ...yarpc.CallOption) (*{{goType .Response $gopkg}}, error) {
-        msg, err := c.stream.Call(ctx, {{printf "%q" .Name}}, req, new{{.ResponseType}}, opts...)
+        msg, err := c.stream.Call(ctx, {{printf "%q" .Name}}, req, {{.NewResponse}}, opts...)
         if err != nil {
           return nil, err
         }
         res, ok := msg.(*{{goType .Response $gopkg}})
         if !ok {
-          return nil, yarpcprotobuf.CastError(_empty{{.ResponseType}}, res)
+          return nil, yarpcprotobuf.CastError({{.EmptyResponse}}, res)
         }
         return res, nil
       }

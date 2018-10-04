@@ -50,10 +50,12 @@ type Method struct {
 	ClientStreaming bool
 	ServerStreaming bool
 
-	StreamClient string
-	StreamServer string
-	RequestType  string
-	ResponseType string
+	StreamClient  string
+	StreamServer  string
+	EmptyRequest  string
+	EmptyResponse string
+	NewRequest    string
+	NewResponse   string
 }
 
 // Message represents a Protobuf message definition.

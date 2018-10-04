@@ -36,13 +36,13 @@
 
     {{if .ClientStreaming}}
     func (s *_{{.StreamServer}}) Recv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
-      msg, err := s.stream.Receive(new{{.RequestType}}, opts...)
+      msg, err := s.stream.Receive({{.NewRequest}}, opts...)
       if err != nil {
         return nil, err
       }
       req, ok := msg.(*{{goType .Request $gopkg}})
       if !ok {
-        return nil, yarpcprotobuf.CastError(_empty{{.RequestType}}, msg)
+        return nil, yarpcprotobuf.CastError({{.EmptyRequest}}, msg)
       }
       return req, nil
     }

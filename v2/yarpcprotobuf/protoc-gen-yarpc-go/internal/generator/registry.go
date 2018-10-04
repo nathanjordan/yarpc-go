@@ -10,6 +10,8 @@ import (
 )
 
 const (
+	_empty        = "_empty"
+	_new          = "new"
 	_client       = "Client"
 	_server       = "Server"
 	_request      = "Request"
@@ -172,10 +174,12 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 		Response:        response,
 		ClientStreaming: m.GetClientStreaming(),
 		ServerStreaming: m.GetServerStreaming(),
-		StreamClient:    streamInterface(svc, name, _clientStream),
-		StreamServer:    streamInterface(svc, name, _serverStream),
-		RequestType:     parameterType(svc, name, _request),
-		ResponseType:    parameterType(svc, name, _response),
+		StreamClient:    join(svc, name, _clientStream),
+		StreamServer:    join(svc, name, _serverStream),
+		EmptyRequest:    join(_empty, svc, name, _request),
+		EmptyResponse:   join(_empty, svc, name, _response),
+		NewRequest:      join(_new, svc, name, _request),
+		NewResponse:     join(_new, svc, name, _response),
 	}, nil
 }
 
@@ -224,32 +228,6 @@ func importPath(f *descriptor.FileDescriptorProto) string {
 		return gopkg[:idx]
 	}
 	return filepath.Dir(f.GetName())
-}
-
-// streamInterface constructs a stream interface name
-// from the given method and service name, appending the
-// stream type as a suffix.
-//
-//  Ex:
-//  service Foo {
-//    Bar(stream BarRequest) returns (BarResponse)
-//
-//  -> FooBarStreamClient / FooBarStreamServer
-func streamInterface(service, method, stream string) string {
-	return join(service, method, stream)
-}
-
-// parameterType constructs a parameter type name
-// from the given method and service name, appending the
-// parameter type as a suffix.
-//
-//  Ex:
-//  service Foo {
-//    Bar(stream BarRequest) returns (BarResponse)
-//
-//  -> FooBarRequest / FooBarResponse
-func parameterType(service, method, parameter string) string {
-	return join(service, method, parameter)
 }
 
 func join(s ...string) string {

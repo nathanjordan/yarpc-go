@@ -7,8 +7,8 @@
   {{/* Parameter constructors */}}
 
   {{range .Methods -}}
-    func new{{.RequestType}}()  { return &{{goType .Request $gopkg}}{}  }
-    func new{{.ResponseType}}() { return &{{goType .Response $gopkg}}{} }
+    func {{.NewRequest}}()  { return &{{goType .Request $gopkg}}{}  }
+    func {{.NewResponse}}() { return &{{goType .Response $gopkg}}{} }
   {{end -}}
 
   {{/* Empty parameter types */}}
@@ -16,8 +16,8 @@
   {{with .Methods}}
     var (
     {{range . -}}
-      _empty{{.RequestType}}  = &{{goType .Request $gopkg}}{}
-      _empty{{.ResponseType}} = &{{goType .Response $gopkg}}{}
+      {{.EmptyRequest}}  = &{{goType .Request $gopkg}}{}
+      {{.EmptyResponse}} = &{{goType .Response $gopkg}}{}
     {{end -}}
     )
   {{end -}}
