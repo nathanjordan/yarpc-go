@@ -52,7 +52,7 @@ func execTemplate(data *Data) ([]byte, error) {
 // if it does not belong to the same package.
 func goType(m *Message, pkg string) string {
 	if m.Package.GoPackage != pkg {
-		return fmt.Sprintf("%s.%s", m.Package.Alias, m.Name)
+		return fmt.Sprintf("%s.%s", m.Package.alias, m.Name)
 	}
 	return m.Name
 }

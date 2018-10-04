@@ -27,7 +27,7 @@ func Generate(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, 
 		if _, ok := targets[filename]; !ok {
 			continue
 		}
-		data, err := r.GetTemplateData(filename)
+		data, err := r.GetData(filename)
 		if err != nil {
 			return nil, err
 		}

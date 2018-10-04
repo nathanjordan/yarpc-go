@@ -15,7 +15,7 @@ type Data struct {
 
 // File represents a Protobuf file descriptor.
 type File struct {
-	*descriptor.FileDescriptorProto
+	descriptor *descriptor.FileDescriptorProto
 
 	Name     string
 	Package  *Package
@@ -25,20 +25,29 @@ type File struct {
 // Package holds information with respect
 // to a Proto type's package.
 type Package struct {
-	Name      string
+	alias string
+	name  string
+
 	GoPackage string
-	Alias     string
+}
+
+// fqn returns the fully-qualified name for
+// the given name based on this package.
+//
+//  Ex:
+//  p := &Package{name: "foo.bar"}
+//  p.fqn("Baz") -> "foo.bar.Baz"
+func (p *Package) fqn(name string) string {
+	return fmt.Sprintf("%s.%s", p.name, name)
 }
 
 // Service represents a Protobuf service definition.
 type Service struct {
 	Name    string
-	Package *Package
+	FQN     string
+	Client  string
+	Server  string
 	Methods []*Method
-
-	FQN    string
-	Client string
-	Server string
 }
 
 // Method represents a standard RPC method.
@@ -60,12 +69,4 @@ type Method struct {
 type Message struct {
 	Name    string
 	Package *Package
-}
-
-// key returns the unique key for the given message type.
-// This is used to uniquely represent the message type so
-// that it can be referenced throughout the code generation
-// process.
-func (m *Message) key() string {
-	return fmt.Sprintf("%s.%s", m.Package.Name, m.Name)
 }

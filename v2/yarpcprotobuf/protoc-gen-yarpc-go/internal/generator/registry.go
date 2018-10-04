@@ -61,7 +61,7 @@ func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 		if !ok {
 			return fmt.Errorf("file target %q was not registered", name)
 		}
-		for _, s := range target.GetService() {
+		for _, s := range target.descriptor.GetService() {
 			if err := r.loadService(target, s); err != nil {
 				return err
 			}
@@ -70,9 +70,9 @@ func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 	return nil
 }
 
-// GetTemplate returns the template data the corresponds
+// GetData returns the template data the corresponds
 // to the given filename.
-func (r *registry) GetTemplateData(filename string) (*Data, error) {
+func (r *registry) GetData(filename string) (*Data, error) {
 	f, err := r.getFile(filename)
 	if err != nil {
 		return nil, err
@@ -115,9 +115,9 @@ func (r *registry) getMessage(name string) (*Message, error) {
 func (r *registry) loadFile(f *descriptor.FileDescriptorProto) {
 	pkg := r.newPackage(f)
 	file := &File{
-		FileDescriptorProto: f,
-		Name:                f.GetName(),
-		Package:             pkg,
+		descriptor: f,
+		Name:       f.GetName(),
+		Package:    pkg,
 	}
 	r.files[file.Name] = file
 	for _, m := range f.GetMessageType() {
@@ -126,11 +126,12 @@ func (r *registry) loadFile(f *descriptor.FileDescriptorProto) {
 }
 
 func (r *registry) loadMessage(f *File, m *descriptor.DescriptorProto) {
+	name := m.GetName()
 	msg := &Message{
-		Name:    m.GetName(),
+		Name:    name,
 		Package: f.Package,
 	}
-	r.messages[msg.key()] = msg
+	r.messages[f.Package.fqn(name)] = msg
 
 	for _, n := range m.GetNestedType() {
 		r.loadMessage(f, n)
@@ -140,11 +141,10 @@ func (r *registry) loadMessage(f *File, m *descriptor.DescriptorProto) {
 func (r *registry) loadService(f *File, s *descriptor.ServiceDescriptorProto) error {
 	name := s.GetName()
 	svc := &Service{
-		Name:    name,
-		Package: f.Package,
-		FQN:     fmt.Sprintf("%s.%s", f.Package.Name, name),
-		Client:  join(name, _client),
-		Server:  join(name, _server),
+		Name:   name,
+		FQN:    f.Package.fqn(name),
+		Client: join(name, _client),
+		Server: join(name, _server),
 	}
 	for _, m := range s.GetMethod() {
 		method, err := r.newMethod(m, name)
@@ -184,9 +184,9 @@ func (r *registry) newMethod(m *descriptor.MethodDescriptorProto, svc string) (*
 
 func (r *registry) newPackage(f *descriptor.FileDescriptorProto) *Package {
 	return &Package{
-		Name:      f.GetPackage(),
+		alias:     r.imports.Add(importPath(f)),
+		name:      f.GetPackage(),
 		GoPackage: goPackage(f),
-		Alias:     r.imports.Add(importPath(f)),
 	}
 }
 

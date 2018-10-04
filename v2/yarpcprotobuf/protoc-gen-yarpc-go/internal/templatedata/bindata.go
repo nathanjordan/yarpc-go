@@ -112,7 +112,7 @@ func internalTemplatedataBindataGo() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "internal/templatedata/bindata.go", size: 0, mode: os.FileMode(420), modTime: time.Unix(1538675225, 0)}
+	info := bindataFileInfo{name: "internal/templatedata/bindata.go", size: 0, mode: os.FileMode(420), modTime: time.Unix(1538676405, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
