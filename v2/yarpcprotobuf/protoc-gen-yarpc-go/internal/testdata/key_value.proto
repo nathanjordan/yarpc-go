@@ -8,9 +8,11 @@ message GetRequest {}
 
 message GetResponse {}
 
-service KeyValue {
-	rpc Foo(GetRequest) returns (GetResponse);
-	rpc Bar(stream GetRequest) returns (GetResponse);
-	rpc Baz(GetRequest) returns (stream GetResponse);
-	rpc Qux(stream GetRequest) returns (stream GetResponse);
+message SetRequest {}
+
+message SetResponse {}
+
+service Store {
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Set(SetRequest) returns (SetResponse);
 }

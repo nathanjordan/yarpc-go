@@ -6,459 +6,201 @@ package keyvaluepb
 
 import (
 	context "context"
-
 	proto "github.com/gogo/protobuf/proto"
 	fx "go.uber.org/fx"
 	yarpc "go.uber.org/yarpc/v2"
 	yarpcprotobuf "go.uber.org/yarpc/v2/yarpcprotobuf"
 )
 
-// KeyValueClient is the KeyValue service's client interface.
-type KeyValueClient interface {
-	Foo(
+// StoreClient is the Store service's client interface.
+type StoreClient interface {
+	Get(
 		context.Context,
 		*GetRequest,
 		...yarpc.CallOption,
 	) (*GetResponse, error)
-	Bar(
+	Set(
 		context.Context,
+		*SetRequest,
 		...yarpc.CallOption,
-	) (KeyValueBarStreamClient, error)
-	Baz(
-		context.Context,
-		*GetRequest,
-		...yarpc.CallOption,
-	) (KeyValueBazStreamClient, error)
-	Qux(
-		context.Context,
-		...yarpc.CallOption,
-	) (KeyValueQuxStreamClient, error)
+	) (*SetResponse, error)
 }
 
-// NewKeyValueClient builds a new YARPC client for the KeyValue service.
-func NewKeyValueClient(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) KeyValueClient {
-	return &_KeyValueClient{stream: yarpcprotobuf.NewStreamClient(c, "keyvalue.KeyValue", opts...)}
+// NewStoreClient builds a new YARPC client for the Store service.
+func NewStoreClient(c yarpc.Client, opts ...yarpcprotobuf.ClientOption) StoreClient {
+	return &_StoreClient{stream: yarpcprotobuf.NewStreamClient(c, "keyvalue.Store", opts...)}
 }
 
-type _KeyValueClient struct {
+type _StoreClient struct {
 	stream yarpcprotobuf.StreamClient
 }
 
-var _ KeyValueClient = (*_KeyValueClient)(nil)
+var _ StoreClient = (*_StoreClient)(nil)
 
-func (c *_KeyValueClient) Foo(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (*GetResponse, error) {
-	msg, err := c.stream.Call(ctx, "Foo", req, newKeyValueFooResponse, opts...)
+func (c *_StoreClient) Get(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (*GetResponse, error) {
+	msg, err := c.stream.Call(ctx, "Get", req, newStoreGetResponse, opts...)
 	if err != nil {
 		return nil, err
 	}
 	res, ok := msg.(*GetResponse)
 	if !ok {
-		return nil, yarpcprotobuf.CastError(_emptyKeyValueFooResponse, res)
+		return nil, yarpcprotobuf.CastError(_emptyStoreGetResponse, res)
 	}
 	return res, nil
 }
 
-func (c *_KeyValueClient) Bar(ctx context.Context, opts ...yarpc.CallOption) (KeyValueBarStreamClient, error) {
-	s, err := c.stream.CallStream(ctx, "Bar", opts...)
-	if err != nil {
-		return err
-	}
-	return &_KeyValueBarStreamClient{stream: s}, nil
-}
-
-func (c *_KeyValueClient) Baz(ctx context.Context, req *GetRequest, opts ...yarpc.CallOption) (KeyValueBazStreamClient, error) {
-	s, err := c.stream.CallStream(ctx, "Baz", opts...)
-	if err != nil {
-		return err
-	}
-	if err := s.Send(req); err != nil {
-		return nil, err
-	}
-	return &_KeyValueBazStreamClient{stream: s}, nil
-}
-
-func (c *_KeyValueClient) Qux(ctx context.Context, opts ...yarpc.CallOption) (KeyValueQuxStreamClient, error) {
-	s, err := c.stream.CallStream(ctx, "Qux", opts...)
+func (c *_StoreClient) Set(ctx context.Context, req *SetRequest, opts ...yarpc.CallOption) (*SetResponse, error) {
+	msg, err := c.stream.Call(ctx, "Set", req, newStoreSetResponse, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &_KeyValueQuxStreamClient{stream: s}, nil
-}
-
-// KeyValueBarStreamClient is a streaming interface used in the KeyValueClient interface.
-type KeyValueBarStreamClient interface {
-	Context() context.Context
-	Send(*GetRequest, ...yarpc.StreamOption) error
-	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
-}
-
-// KeyValueBazStreamClient is a streaming interface used in the KeyValueClient interface.
-type KeyValueBazStreamClient interface {
-	Context() context.Context
-	Recv(...yarpc.StreamOption) (*GetResponse, error)
-	CloseSend(...yarpc.StreamOption) error
-}
-
-// KeyValueQuxStreamClient is a streaming interface used in the KeyValueClient interface.
-type KeyValueQuxStreamClient interface {
-	Context() context.Context
-	Send(*GetRequest, ...yarpc.StreamOption) error
-	Recv(...yarpc.StreamOption) (*GetResponse, error)
-	CloseSend(...yarpc.StreamOption) error
-}
-
-type _KeyValueBarStreamClient struct {
-	stream *yarpcprotobuf.StreamClient
-}
-
-var _ KeyValueBarStreamClient = (*_KeyValueBarStreamClient)(nil)
-
-func (c *_KeyValueBarStreamClient) Context() context.Context {
-	return c.stream.Context()
-}
-
-func (c *_KeyValueBarStreamClient) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
-	return c.stream.Send(req, opts...)
-}
-
-func (c *_KeyValueBarStreamClient) CloseAndRecv(opts ...yarpc.StreamOption) (*GetRequest, error) {
-	if err := c.stream.Close(opts...); err != nil {
-		return nil, err
-	}
-	msg, err := c.stream.Receive(newKeyValueBarResponse, opts...)
-	if err != nil {
-		return nil, err
-	}
-	res, ok := msg.(*GetResponse)
+	res, ok := msg.(*SetResponse)
 	if !ok {
-		return nil, yarpcprotobuf.CastError(_emptyKeyValueBarResponse, msg)
-	}
-	return res, err
-}
-
-type _KeyValueBazStreamClient struct {
-	stream *yarpcprotobuf.StreamClient
-}
-
-var _ KeyValueBazStreamClient = (*_KeyValueBazStreamClient)(nil)
-
-func (c *_KeyValueBazStreamClient) Context() context.Context {
-	return c.stream.Context()
-}
-
-func (c *_KeyValueBazStreamClient) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
-	msg, err := c.stream.Receive(newKeyValueBazResponse, opts...)
-	if err != nil {
-		return nil, err
-	}
-	res, ok := msg.(*GetResponse)
-	if !ok {
-		return nil, yarpcprotobuf.CastError(_emptyKeyValueBazResponse, msg)
+		return nil, yarpcprotobuf.CastError(_emptyStoreSetResponse, res)
 	}
 	return res, nil
 }
 
-func (c *_KeyValueBazStreamClient) CloseSend(opts ...yarpc.StreamOption) error {
-	return c.stream.Close(opts...)
-}
-
-type _KeyValueQuxStreamClient struct {
-	stream *yarpcprotobuf.StreamClient
-}
-
-var _ KeyValueQuxStreamClient = (*_KeyValueQuxStreamClient)(nil)
-
-func (c *_KeyValueQuxStreamClient) Context() context.Context {
-	return c.stream.Context()
-}
-
-func (c *_KeyValueQuxStreamClient) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
-	return c.stream.Send(req, opts...)
-}
-
-func (c *_KeyValueQuxStreamClient) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
-	msg, err := c.stream.Receive(newKeyValueQuxResponse, opts...)
-	if err != nil {
-		return nil, err
-	}
-	res, ok := msg.(*GetResponse)
-	if !ok {
-		return nil, yarpcprotobuf.CastError(_emptyKeyValueQuxResponse, msg)
-	}
-	return res, nil
-}
-
-func (c *_KeyValueQuxStreamClient) CloseSend(opts ...yarpc.StreamOption) error {
-	return c.stream.Close(opts...)
-}
-
-// KeyValueServer is the KeyValue service's server interface.
-type KeyValueServer interface {
-	Foo(
+// StoreServer is the Store service's server interface.
+type StoreServer interface {
+	Get(
 		context.Context,
 		*GetRequest,
 	) (*GetResponse, error)
-	Bar(
-		KeyValueBarStreamServer,
-	) (KeyValueBarStreamServer, error)
-	Baz(
-		*GetRequest,
-		KeyValueBazStreamServer,
-	) error
-	Qux(
-		KeyValueQuxStreamServer,
-	) error
+	Set(
+		context.Context,
+		*SetRequest,
+	) (*SetResponse, error)
 }
 
-// BuildKeyValueProcedures constructs the YARPC procedures for the KeyValue service.
-func BuildKeyValueProcedures(s KeyValueServer) []yarpc.Procedure {
-	h := &_KeyValueServer{server: s}
+// BuildStoreProcedures constructs the YARPC procedures for the Store service.
+func BuildStoreProcedures(s StoreServer) []yarpc.Procedure {
+	h := &_StoreServer{server: s}
 	return yarpcprotobuf.Procedures(
 		yarpcprotobuf.ProceduresParams{
-			Service: "keyvalue.KeyValue",
+			Service: "keyvalue.Store",
 			Unary: []yarpcprotobuf.UnaryProceduresParams{
 				{
-					MethodName: "Foo",
+					MethodName: "Get",
 					Handler: yarpcprotobuf.NewUnaryHandler{
 						yarpcprotobuf.UnaryHandlerParams{
-							Handle: h.Foo,
-							Create: newKeyValueFooRequest(),
+							Handle: h.Get,
+							Create: newStoreGetRequest(),
+						},
+					},
+				},
+				{
+					MethodName: "Set",
+					Handler: yarpcprotobuf.NewUnaryHandler{
+						yarpcprotobuf.UnaryHandlerParams{
+							Handle: h.Set,
+							Create: newStoreSetRequest(),
 						},
 					},
 				},
 			},
-			Stream: []yarpcprotobuf.StreamProceduresParams{
-				{
-					MethodName: "Bar",
-					Handler: yarpcprotobuf.NewStreamHandler{
-						yarpcprotobuf.StreamHandlerParams{
-							Handle: h.Bar,
-						},
-					},
-				},
-				{
-					MethodName: "Baz",
-					Handler: yarpcprotobuf.NewStreamHandler{
-						yarpcprotobuf.StreamHandlerParams{
-							Handle: h.Baz,
-						},
-					},
-				},
-				{
-					MethodName: "Qux",
-					Handler: yarpcprotobuf.NewStreamHandler{
-						yarpcprotobuf.StreamHandlerParams{
-							Handle: h.Qux,
-						},
-					},
-				},
-			},
+			Stream: []yarpcprotobuf.StreamProceduresParams{},
 		},
 	)
 }
 
-type _KeyValueServer struct {
-	server KeyValueServer
+type _StoreServer struct {
+	server StoreServer
 }
 
-var _ KeyValueServer = (*_KeyValueServer)(nil)
+var _ StoreServer = (*_StoreServer)(nil)
 
-func (h *_KeyValueServer) Foo(ctx context.Context, m proto.Message) (proto.Message, error) {
+func (h *_StoreServer) Get(ctx context.Context, m proto.Message) (proto.Message, error) {
 	req, _ := m.(*GetRequest)
 	if req == nil {
-		return nil, yarpcprotobuf.CastError(_emptyKeyValueFooRequest, m)
+		return nil, yarpcprotobuf.CastError(_emptyStoreGetRequest, m)
 	}
-	return h.server.Foo(ctx, req)
+	return h.server.Get(ctx, req)
 }
 
-func (h *_KeyValueServer) Bar(s *yarpcprotobuf.StreamServer) error {
-	res, err := h.server.Bar(&_KeyValueBarStreamServer{server: s})
-	if err != nil {
-		return err
-	}
-	return s.Send(res)
-}
-
-func (h *_KeyValueServer) Baz(s *yarpcprotobuf.StreamServer) error {
-	recv, err := s.Receive(newKeyValueBazRequest)
-	if err != nil {
-		return err
-	}
-	req, _ := recv.(*GetRequest)
+func (h *_StoreServer) Set(ctx context.Context, m proto.Message) (proto.Message, error) {
+	req, _ := m.(*SetRequest)
 	if req == nil {
-		return yarpcprotobuf.CastError(_emptyKeyValueBazRequest, recv)
+		return nil, yarpcprotobuf.CastError(_emptyStoreSetRequest, m)
 	}
-	return h.server.Baz(req, &_KeyValueBazStreamServer{server: s})
+	return h.server.Set(ctx, req)
 }
 
-func (h *_KeyValueServer) Qux(s *yarpcprotobuf.StreamServer) error {
-	return h.server.Qux(&_KeyValueQuxStreamServer{stream: s})
-}
-
-// KeyValueBarStreamServer is a streaming interface used in the KeyValueServer interface.
-type KeyValueBarStreamServer interface {
-	Context() context.Context
-	Recv(...yarpc.StreamOption) (*GetRequest, error)
-}
-
-// KeyValueBazStreamServer is a streaming interface used in the KeyValueServer interface.
-type KeyValueBazStreamServer interface {
-	Context() context.Context
-	Send(*GetResponse, ...yarpc.StreamOption) error
-}
-
-// KeyValueQuxStreamServer is a streaming interface used in the KeyValueServer interface.
-type KeyValueQuxStreamServer interface {
-	Context() context.Context
-	Recv(...yarpc.StreamOption) (*GetRequest, error)
-	Send(*GetResponse, ...yarpc.StreamOption) error
-}
-
-type _KeyValueBarStreamServer struct {
-	stream *yarpcprotobuf.StreamServer
-}
-
-var _ KeyValueBarStreamServer = (*_KeyValueBarStreamServer)(nil)
-
-func (s *_KeyValueBarStreamServer) Context() context.Context {
-	return s.stream.Context()
-}
-
-func (s *_KeyValueBarStreamServer) Recv(opts ...yarpc.StreamOption) (*GetRequest, error) {
-	msg, err := s.stream.Receive(newKeyValueBarRequest, opts...)
-	if err != nil {
-		return nil, err
-	}
-	req, ok := msg.(*GetRequest)
-	if !ok {
-		return nil, yarpcprotobuf.CastError(_emptyKeyValueBarRequest, msg)
-	}
-	return req, nil
-}
-
-type _KeyValueBazStreamServer struct {
-	stream *yarpcprotobuf.StreamServer
-}
-
-var _ KeyValueBazStreamServer = (*_KeyValueBazStreamServer)(nil)
-
-func (s *_KeyValueBazStreamServer) Context() context.Context {
-	return s.stream.Context()
-}
-
-func (s *_KeyValueBazStreamServer) Send(res *GetResponse, opts ...yarpc.StreamOption) error {
-	return s.stream.Send(res, opts...)
-}
-
-type _KeyValueQuxStreamServer struct {
-	stream *yarpcprotobuf.StreamServer
-}
-
-var _ KeyValueQuxStreamServer = (*_KeyValueQuxStreamServer)(nil)
-
-func (s *_KeyValueQuxStreamServer) Context() context.Context {
-	return s.stream.Context()
-}
-
-func (s *_KeyValueQuxStreamServer) Recv(opts ...yarpc.StreamOption) (*GetRequest, error) {
-	msg, err := s.stream.Receive(newKeyValueQuxRequest, opts...)
-	if err != nil {
-		return nil, err
-	}
-	req, ok := msg.(*GetRequest)
-	if !ok {
-		return nil, yarpcprotobuf.CastError(_emptyKeyValueQuxRequest, msg)
-	}
-	return req, nil
-}
-
-func (s *_KeyValueQuxStreamServer) Send(res *GetResponse, opts ...yarpc.StreamOption) error {
-	return s.stream.Send(res, opts...)
-}
-
-// FxKeyValueClientParams defines the parameters
-// required to provide a KeyValueClient into an
+// FxStoreClientParams defines the parameters
+// required to provide a StoreClient into an
 // Fx application.
-type FxKeyValueClientParams struct {
+type FxStoreClientParams struct {
 	fx.In
 
 	Client yarpc.Client
 }
 
-// FxKeyValueClientResult provides a KeyValueClient
+// FxStoreClientResult provides a StoreClient
 // into an Fx application.
-type FxKeyValueClientResult struct {
+type FxStoreClientResult struct {
 	fx.Out
 
-	Client KeyValueClient
+	Client StoreClient
 }
 
-// NewFxKeyValueClient provides a KeyValueClient
+// NewFxStoreClient provides a StoreClient
 // into an Fx application, using the given
 // name for routing.
 //
 //  fx.Provide(
-//    keyvaluepb.NewFxKeyValueClient("service-name"),
+//    keyvaluepb.NewFxStoreClient("service-name"),
 //    ...
 //  )
 // TODO(mensch): How will this work in v2?
-func NewFxKeyValueClient(_ string, opts ...yarpcprotobuf.ClientOption) interface{} {
-	return func(p FxKeyValueClientParams) FxKeyValueClientResult {
-		return FxKeyValueClientResult{
-			Client: NewFxKeyValueClient(p.Client, opts...),
+func NewFxStoreClient(_ string, opts ...yarpcprotobuf.ClientOption) interface{} {
+	return func(p FxStoreClientParams) FxStoreClientResult {
+		return FxStoreClientResult{
+			Client: NewFxStoreClient(p.Client, opts...),
 		}
 	}
 }
 
-// FxKeyValueServerParams defines the paramaters
-// required to provide the KeyValueServer procedures
+// FxStoreServerParams defines the paramaters
+// required to provide the StoreServer procedures
 // into an Fx application.
-type FxKeyValueServerParams struct {
+type FxStoreServerParams struct {
 	fx.In
 
-	Server KeyValueServer
+	Server StoreServer
 }
 
-// FxKeyValueServerResult provides the KeyValueServer
+// FxStoreServerResult provides the StoreServer
 // procedures into an Fx application.
-type FxKeyValueServerResult struct {
+type FxStoreServerResult struct {
 	fx.Out
 
 	Procedures []yarpc.Procedure `group:"yarpcfx"`
 }
 
-// NewFxKeyValueServer provides the KeyValueServer
+// NewFxStoreServer provides the StoreServer
 // procedures to an Fx application. It expects
-// a KeyValueServer to be present in the container.
+// a StoreServer to be present in the container.
 //
 //  fx.Provide(
-//    keyvaluepb.NewFxKeyValueServer(),
+//    keyvaluepb.NewFxStoreServer(),
 //    ...
 //  )
-func NewFxKeyValueServer() interface{} {
-	return func(p FxKeyValueServerParams) FxKeyValueServerResult {
-		return FxKeyValueServerResult{
-			Procedures: BuildKeyValueProcedures(p.Server),
+func NewFxStoreServer() interface{} {
+	return func(p FxStoreServerParams) FxStoreServerResult {
+		return FxStoreServerResult{
+			Procedures: BuildStoreProcedures(p.Server),
 		}
 	}
 }
 
-func newKeyValueFooRequest()  { return &GetRequest{} }
-func newKeyValueFooResponse() { return &GetResponse{} }
-func newKeyValueBarRequest()  { return &GetRequest{} }
-func newKeyValueBarResponse() { return &GetResponse{} }
-func newKeyValueBazRequest()  { return &GetRequest{} }
-func newKeyValueBazResponse() { return &GetResponse{} }
-func newKeyValueQuxRequest()  { return &GetRequest{} }
-func newKeyValueQuxResponse() { return &GetResponse{} }
+func newStoreGetRequest()  { return &GetRequest{} }
+func newStoreGetResponse() { return &GetResponse{} }
+func newStoreSetRequest()  { return &SetRequest{} }
+func newStoreSetResponse() { return &SetResponse{} }
 
 var (
-	_emptyKeyValueFooRequest  = &GetRequest{}
-	_emptyKeyValueFooResponse = &GetResponse{}
-	_emptyKeyValueBarRequest  = &GetRequest{}
-	_emptyKeyValueBarResponse = &GetResponse{}
-	_emptyKeyValueBazRequest  = &GetRequest{}
-	_emptyKeyValueBazResponse = &GetResponse{}
-	_emptyKeyValueQuxRequest  = &GetRequest{}
-	_emptyKeyValueQuxResponse = &GetResponse{}
+	_emptyStoreGetRequest  = &GetRequest{}
+	_emptyStoreGetResponse = &GetResponse{}
+	_emptyStoreSetRequest  = &SetRequest{}
+	_emptyStoreSetResponse = &SetResponse{}
 )
