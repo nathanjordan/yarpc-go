@@ -2,14 +2,14 @@
 // source: key_value.proto
 // DO NOT EDIT!
 
-package keyvalue
+package keyvaluepb
 
 import (
 	context "context"
 
 	proto "github.com/gogo/protobuf/proto"
 	fx "go.uber.org/fx"
-	yarpc "go.uber.org/yarpc/v2/yarpc"
+	yarpc "go.uber.org/yarpc/v2"
 	yarpcprotobuf "go.uber.org/yarpc/v2/yarpcprotobuf"
 )
 
@@ -398,7 +398,7 @@ type FxKeyValueClientResult struct {
 // name for routing.
 //
 //  fx.Provide(
-//    keyvalue.NewFxKeyValueClient("service-name"),
+//    keyvaluepb.NewFxKeyValueClient("service-name"),
 //    ...
 //  )
 // TODO(mensch): How will this work in v2?
@@ -432,7 +432,7 @@ type FxKeyValueServerResult struct {
 // a KeyValueServer to be present in the container.
 //
 //  fx.Provide(
-//    keyvalue.NewFxKeyValueServer(),
+//    keyvaluepb.NewFxKeyValueServer(),
 //    ...
 //  )
 func NewFxKeyValueServer() interface{} {

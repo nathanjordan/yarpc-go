@@ -9,15 +9,6 @@ import (
 // to the package path.
 type Imports map[string]string
 
-// newImports returns a new Imports struct with the given paths.
-func newImports(paths ...string) Imports {
-	imports := Imports{}
-	for _, path := range paths {
-		imports.Add(path)
-	}
-	return imports
-}
-
 // Add adds the path to the imports map, initially using the base directory
 // as the package alias. If this alias is already in use, we continue to
 // prepend the remaining filepath elements until we have receive a unique

@@ -39,13 +39,13 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 	r := &registry{
 		files:    make(map[string]*File),
 		messages: make(map[string]*Message),
-		imports: newImports(
-			"context",
-			"github.com/gogo/protobuf/proto",
-			"go.uber.org/fx",
-			"go.uber.org/yarpc/v2/yarpc",
-			"go.uber.org/yarpc/v2/yarpcprotobuf",
-		),
+		imports: Imports{
+			"context":                            "context",
+			"go.uber.org/fx":                     "fx",
+			"github.com/gogo/protobuf/proto":     "proto",
+			"go.uber.org/yarpc/v2":               "yarpc",
+			"go.uber.org/yarpc/v2/yarpcprotobuf": "yarpcprotobuf",
+		},
 	}
 	return r, r.Load(req)
 }
