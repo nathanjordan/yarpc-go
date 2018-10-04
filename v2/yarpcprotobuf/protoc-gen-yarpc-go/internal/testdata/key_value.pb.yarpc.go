@@ -359,6 +359,73 @@ func (s *_KeyValueQuxServerStream) Send(res *GetResponse, opts ...yarpc.StreamOp
 	return s.stream.Send(res, opts...)
 }
 
+// FxKeyValueClientParams defines the parameters
+// required to provide a KeyValueClient into an
+// Fx application.
+type FxKeyValueClientParams struct {
+	fx.In
+
+	Client yarpc.Client
+}
+
+// FxKeyValueClientResult provides a KeyValueClient
+// into an Fx application.
+type FxKeyValueClientResult struct {
+	fx.Out
+
+	Client KeyValueClient
+}
+
+// NewFxKeyValueClient provides a KeyValueClient
+// into an Fx application, using the given
+// name for routing.
+//
+//  fx.Provide(
+//    keyvalue.NewFxKeyValueClient("service-name"),
+//    ...
+//  )
+// TODO(mensch): How will this work in v2?
+func NewFxKeyValueClient(_ string, opts ...yarpcprotobuf.ClientOption) interface{} {
+	return func(p FxKeyValueClientParams) FxKeyValueClientResult {
+		return FxKeyValueClientResult{
+			Client: NewFxKeyValueClient(p.Client, opts...),
+		}
+	}
+}
+
+// FxKeyValueProceduresParams defines the paramaters
+// required to provide the KeyValueServer procedures
+// into an Fx application.
+type FxKeyValueProceduresParams struct {
+	fx.In
+
+	Server KeyValueServer
+}
+
+// FxKeyValueProceduresResult provides the KeyValueServer
+// procedures into an Fx application.
+type FxKeyValueProceduresResult struct {
+	fx.Out
+
+	Procedures []yarpc.Procedure `group:"yarpcfx"`
+}
+
+// NewFxKeyValueProcedures provides the KeyValueServer
+// procedures to an Fx application. It expects
+// a KeyValueServer to be present in the container.
+//
+//  fx.Provide(
+//    keyvalue.NewFxKeyValueProcedures(),
+//    ...
+//  )
+func NewFxKeyValueProcedures() interface{} {
+	return func(p FxKeyValueProceduresParams) FxKeyValueProceduresResult {
+		return FxKeyValueProceduresResult{
+			Procedures: BuildKeyValueProcedures(p.Server),
+		}
+	}
+}
+
 func newKeyValueFooRequest()  { return &GetRequest{} }
 func newKeyValueFooResponse() { return &GetResponse{} }
 func newKeyValueBarRequest()  { return &GetRequest{} }

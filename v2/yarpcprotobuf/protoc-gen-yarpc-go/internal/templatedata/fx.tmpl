@@ -49,7 +49,7 @@ func New{{$fxClient}}(_ string, opts ...yarpcprotobuf.ClientOption) interface{} 
 // {{$fxProcedures}}Params defines the paramaters
 // required to provide the {{.Server}} procedures
 // into an Fx application.
-type {{$fxProecdures}}Params struct {
+type {{$fxProcedures}}Params struct {
   fx.In
 
   Server {{.Server}}
