@@ -34,28 +34,6 @@ type KeyValueClient interface {
 	) (KeyValueQuxClientStream, error)
 }
 
-// KeyValueBarClientStream is a streaming interface used in the KeyValue}Client interface.
-type KeyValueBarClientStream interface {
-	Context() context.Context
-	Send(*GetRequest, ...yarpc.StreamOption) error
-	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
-}
-
-// KeyValueBazClientStream is a streaming interface used in the KeyValue}Client interface.
-type KeyValueBazClientStream interface {
-	Context() context.Context
-	Recv(...yarpc.StreamOption) (*GetResponse, error)
-	CloseSend(...yarpc.StreamOption) error
-}
-
-// KeyValueQuxClientStream is a streaming interface used in the KeyValue}Client interface.
-type KeyValueQuxClientStream interface {
-	Context() context.Context
-	Send(*GetRequest, ...yarpc.StreamOption) error
-	Recv(...yarpc.StreamOption) (*GetResponse, error)
-	CloseSend(...yarpc.StreamOption) error
-}
-
 type _KeyValueCaller struct {
 	stream yarpcprotobuf.StreamClient
 }
@@ -97,6 +75,107 @@ func (c *_KeyValueCaller) Qux(ctx context.Context, opts ...yarpc.CallOption) (Ke
 		return nil, err
 	}
 	return &_KeyValueQuxClientStream{stream: s}, nil
+}
+
+// KeyValueBarClientStream is a streaming interface used in the KeyValue}Client interface.
+type KeyValueBarClientStream interface {
+	Context() context.Context
+	Send(*GetRequest, ...yarpc.StreamOption) error
+	CloseAndRecv(...yarpc.StreamOption) (*GetResponse, error)
+}
+
+// KeyValueBazClientStream is a streaming interface used in the KeyValue}Client interface.
+type KeyValueBazClientStream interface {
+	Context() context.Context
+	Recv(...yarpc.StreamOption) (*GetResponse, error)
+	CloseSend(...yarpc.StreamOption) error
+}
+
+// KeyValueQuxClientStream is a streaming interface used in the KeyValue}Client interface.
+type KeyValueQuxClientStream interface {
+	Context() context.Context
+	Send(*GetRequest, ...yarpc.StreamOption) error
+	Recv(...yarpc.StreamOption) (*GetResponse, error)
+	CloseSend(...yarpc.StreamOption) error
+}
+
+type _KeyValueBarClientStream struct {
+	stream *yarpcprotobuf.ClientStream
+}
+
+func (c *_KeyValueBarClientStream) Context() context.Context {
+	return c.stream.Context()
+}
+
+func (c *_KeyValueBarClientStream) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
+	return c.stream.Send(req, opts...)
+}
+
+func (c *_KeyValueBarClientStream) CloseAndRecv(opts ...yarpc.StreamOption) (*GetRequest, error) {
+	if err := c.stream.Close(opts...); err != nil {
+		return nil, err
+	}
+	msg, err := c.stream.Receive(newKeyValueBarResponse, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res, ok := msg.(*GetResponse)
+	if !ok {
+		return nil, protobuf.CastError(_emptyKeyValueBarResponse, msg)
+	}
+	return res, err
+}
+
+type _KeyValueBazClientStream struct {
+	stream *yarpcprotobuf.ClientStream
+}
+
+func (c *_KeyValueBazClientStream) Context() context.Context {
+	return c.stream.Context()
+}
+
+func (c *_KeyValueBazClientStream) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
+	msg, err := c.stream.Receive(newKeyValueBazResponse, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res, ok := msg.(*KeyValueBazResponse)
+	if !ok {
+		return nil, yarpcprotobuf.CastError(_emptyKeyValueBazResponse, msg)
+	}
+	return res, nil
+}
+
+func (c *_KeyValueBazClientStream) CloseSend(opts ...yarpc.StreamOption) error {
+	return c.stream.Close(opts...)
+}
+
+type _KeyValueQuxClientStream struct {
+	stream *yarpcprotobuf.ClientStream
+}
+
+func (c *_KeyValueQuxClientStream) Context() context.Context {
+	return c.stream.Context()
+}
+
+func (c *_KeyValueQuxClientStream) Send(req *GetRequest, opts ...yarpc.StreamOption) error {
+	return c.stream.Send(req, opts...)
+}
+
+func (c *_KeyValueQuxClientStream) Recv(opts ...yarpc.StreamOption) (*GetResponse, error) {
+	msg, err := c.stream.Receive(newKeyValueQuxResponse, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res, ok := msg.(*KeyValueQuxResponse)
+	if !ok {
+		return nil, yarpcprotobuf.CastError(_emptyKeyValueQuxResponse, msg)
+	}
+	return res, nil
+}
+
+func (c *_KeyValueQuxClientStream) CloseSend(opts ...yarpc.StreamOption) error {
+	return c.stream.Close(opts...)
 }
 
 // KeyValueServer is the KeyValue service's server interface.

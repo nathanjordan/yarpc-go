@@ -66,7 +66,7 @@ const _clientStreamTemplate = `
     {{end -}}
 
     {{if and .ClientStreaming (not .ServerStreaming)}}
-    func (c *_{{.ClientStream}} CloseAndRecv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
+    func (c *_{{.ClientStream}}) CloseAndRecv(opts ...yarpc.StreamOption) (*{{goType .Request $gopkg}}, error) {
       if err := c.stream.Close(opts...); err != nil {
         return nil, err
       }
