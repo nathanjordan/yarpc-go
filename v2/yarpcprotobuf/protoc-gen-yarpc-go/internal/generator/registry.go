@@ -1,3 +1,23 @@
+// Copyright (c) 2018 Uber Technologies, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 package generator
 
 import (
@@ -24,11 +44,7 @@ const (
 )
 
 // registry is used to collect and register all
-// of the Protobuf types relevant for
-// protoc-gen-yarpc-go. This concept is inspired
-// by the registry implemented for protoc-gen-grpc-gateway,
-// but has been adapted so that it only concerns itself
-// with a minimal feature set.
+// of the Protobuf types relevant to protoc-gen-yarpc-go.
 type registry struct {
 	files    map[string]*File
 	messages map[string]*Message
@@ -239,9 +255,12 @@ func goPackage(f *descriptor.FileDescriptorProto) string {
 
 // importPath returns the package import path that corresponds to
 // the given file descriptor.
+//
 // We first determine whether the user has provided a package modifier for the
 // file, and use its value if so.
+//
 // Otherwise, we use the go_package option if it is explicitly configured.
+//
 // If neither of these values are set, we cannot confidently determine a valid
 // import path; default to the file source's directory in this case.
 //
