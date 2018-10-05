@@ -14,6 +14,7 @@ TEMPLATES = \
 
 .PHONY: generate
 generate:
+	@go get -u github.com/uber/prototool/internal/cmd/prototool
 	@prototool generate $(TEST_DATA)
 
 .PHONY: templates

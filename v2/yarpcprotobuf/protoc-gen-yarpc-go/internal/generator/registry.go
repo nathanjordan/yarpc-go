@@ -70,11 +70,8 @@ func newRegistry(req *plugin.CodeGeneratorRequest) (*registry, error) {
 	return r, r.Load(req)
 }
 
-// Load registers all of the Proto types provided in the CodeGeneratorRequest
-// with the registry. Note that all CodeGeneratorRequests SHOULD only request
-// to generate a single go package. Otherwise, multiple go packages will
-// be deposited in the same directory and will therefore not compile. This
-// is synonymous to the protoc-gen-go plugin restriction.
+// Load registers all of the Proto types provided in the
+// CodeGeneratorRequest with the registry.
 func (r *registry) Load(req *plugin.CodeGeneratorRequest) error {
 	for _, f := range req.GetProtoFile() {
 		r.loadFile(f)
@@ -246,9 +243,8 @@ func goPackage(f *descriptor.FileDescriptorProto) string {
 // file, and use its value if so.
 // Otherwise, we use the go_package option if it is explicitly configured.
 // If neither of these values are set, we cannot confidently determine a valid
-// import path. We default to the file source's directory in this case.
+// import path; default to the file source's directory in this case.
 //
-//  Ex:
 //   protoc --yarpc-go_out=Mfoo/bar=path/to/foo/bar:.
 //   -> "path/to/foo/bar"
 //

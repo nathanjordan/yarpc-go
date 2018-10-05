@@ -34,7 +34,6 @@ type Package struct {
 // fqn returns the fully-qualified name for
 // the given name based on this package.
 //
-//  Ex:
 //  p := &Package{name: "foo.bar"}
 //  p.fqn("Baz") -> "foo.bar.Baz"
 func (p *Package) fqn(name string) string {
@@ -42,6 +41,18 @@ func (p *Package) fqn(name string) string {
 }
 
 // Service represents a Protobuf service definition.
+//
+//  {
+//    Name:       "Baz",
+//    FQN:        "foo.bar.Baz",
+//    Client:     "BazClient",
+//    ClientImpl: "_BazClient",
+//    FxClient:   "FxBazClient",
+//    Server:     "BazServer",
+//    ServerImpl: "_BazServer",
+//    FxServer:   "FxBazServer",
+//    Procedures: "BazProcedures",
+//  }
 type Service struct {
 	Name       string
 	FQN        string
@@ -56,6 +67,18 @@ type Service struct {
 }
 
 // Method represents a standard RPC method.
+//
+//  {
+//    Name:             "FooBar",
+//    StreamClient:     "FooBarStreamClient",
+//    StreamClientImpl: "_FooBarStreamClient",
+//    StreamServer:     "FooBarStreamServer",
+//    StreamServerImpl: "_FooBarStreamServer",
+//    EmptyRequest:     "_emptyFooBarRequest",
+//    EmptyResponse:    "_emptyFooBarResponse",
+//    NewRequest:       "newFooBarRequest",
+//    NewResponse:      "newFooBarResponse",
+//  }
 type Method struct {
 	Name             string
 	Request          *Message

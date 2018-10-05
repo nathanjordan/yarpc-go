@@ -15,7 +15,6 @@ type Imports map[string]string
 // alias. If all of the path elements are exhausted, a '_' is continually used
 // until we create a unique alias.
 //
-//  Ex:
 //   imports := NewImports("json")
 //   imports.Add("encoding/json") -> "encodingjson"
 //   imports.Add("encodingjson")  -> "_encodingjson"
