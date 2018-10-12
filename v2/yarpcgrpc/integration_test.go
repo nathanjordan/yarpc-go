@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package grpc
+package yarpcgrpc
 
 import (
 	"context"
@@ -426,10 +426,10 @@ func createTLSScenario(t *testing.T, clientValidity time.Duration, serverValidit
 			},
 			SerialNumber:          big.NewInt(1),
 			BasicConstraintsValid: true,
-			IsCA:      true,
-			KeyUsage:  x509.KeyUsageCertSign,
-			NotBefore: now,
-			NotAfter:  now.Add(10 * time.Minute),
+			IsCA:                  true,
+			KeyUsage:              x509.KeyUsageCertSign,
+			NotBefore:             now,
+			NotAfter:              now.Add(10 * time.Minute),
 		},
 		&x509.Certificate{},
 		caKey.Public(),
