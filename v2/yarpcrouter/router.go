@@ -80,7 +80,7 @@ func NewMapRouterWithEncodingProcedures(defaultService string, encodingProcedure
 				return nil, nil, codecErr
 			}
 
-			response, body, err := p.HandlerSpec.Unary().Handle(c, r, decodedBody)
+			body, err := p.HandlerSpec.Unary().Handle(c, decodedBody)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -90,7 +90,7 @@ func NewMapRouterWithEncodingProcedures(defaultService string, encodingProcedure
 				return nil, nil, codecErr
 			}
 
-			return response, encodedBody, nil
+			return nil, encodedBody, nil
 		}
 
 		transportProcedures = append(
